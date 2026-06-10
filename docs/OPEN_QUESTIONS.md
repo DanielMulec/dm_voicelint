@@ -12,10 +12,6 @@ Preferred order:
 - `@voicelint/cli`
 - `@dm/voicelint`
 
-## License
-
-Resolved: VoiceLint should use MIT.
-
 ## First Semantic Provider
 
 Semantic provider work is deferred until the mechanical engine works.

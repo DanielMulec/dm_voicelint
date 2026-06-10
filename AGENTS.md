@@ -26,6 +26,13 @@ This file is the working contract for AI coding agents in this repository.
 - Provider credentials must not live in repo config.
 - Cache semantic checks in a local user cache, not in the repo, unless a later decision changes that.
 
+## Documentation Hygiene
+
+- When a product or architecture question is decided, record the decision in `docs/DECISIONS.md`.
+- Remove settled questions from `docs/OPEN_QUESTIONS.md`; do not leave "resolved" entries there.
+- Keep decided material in other docs only when that document still needs it for user-facing explanation, implementation guidance, or roadmap context.
+- Prefer moving content to the document with the clearest ownership instead of duplicating the same decision across several docs.
+
 ## Repository Workflow
 
 - For maintainer-local Codex work, stay on `main` unless Daniel explicitly asks for another branch.
