@@ -36,6 +36,19 @@ Codex only loads project-local hooks for trusted projects.
 Open Codex, inspect the hook config, and trust this project if you want the hook to run.
 ```
 
+## Existing Hook Files
+
+`init --agent` must preserve existing hook configuration.
+
+Required behavior:
+
+- parse the existing project-local hook file before editing it
+- add the VoiceLint hook only if it is not already present
+- keep existing hooks and unrelated settings
+- write a backup before changing an existing hook file
+- abort with a clear manual instruction if the existing file cannot be parsed safely
+- never overwrite a hook file wholesale unless the user explicitly asks for reset behavior
+
 ## Codex
 
 Codex supports project-local configuration and hooks, but project-local config is only loaded when the project is trusted.
@@ -57,7 +70,7 @@ VoiceLint should provide a Claude setup path, but the core CLI should not depend
 
 ## Agent-Assisted Semantic Checks
 
-Agent-assisted semantic checks are deferred.
+Agent-assisted semantic checks are a research direction, not part of the mechanical MVP.
 
 The idea:
 
@@ -73,7 +86,12 @@ This may reduce the need for separate LLM API keys in agent-first workflows, but
 - Every agent harness behaves differently.
 - The CLI cannot assume a standard cross-agent callback API.
 
-The v0.1 implementation should support deterministic linting and optional provider-backed semantic linting first. Agent-assisted semantic checks belong in the backlog.
+The implementation should start with deterministic linting. Once the mechanical engine works, semantic linting should be evaluated in two tracks:
+
+1. provider-backed semantic linting
+2. agent-assisted semantic linting through active Codex, Claude Code, or similar sessions
+
+The product preference is to make agent-assisted semantic linting work if it can be made reliable enough, because it may avoid separate API keys in agent-first workflows.
 
 ## Hook Output
 

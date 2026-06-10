@@ -8,6 +8,14 @@ VoiceLint should be distributed as a public npm package.
 
 Public npm packages are free to publish and install on the public npm registry. Private npm packages require a paid npm account. VoiceLint should start public and open-source, with GitHub as the source repository and npm as the primary package distribution channel.
 
+Preferred package name order:
+
+1. `voicelint`
+2. `@voicelint/cli`
+3. `@dm/voicelint`
+
+The unscoped `voicelint` name is preferred if available because it is short and matches CLI usage. A scoped package is acceptable if the unscoped name is unavailable or if a namespace becomes useful later.
+
 Primary commands:
 
 ```bash
@@ -23,6 +31,12 @@ npm install -D voicelint
 ```
 
 This lets `npx voicelint` resolve the project-pinned version instead of fetching a temporary remote package.
+
+## License
+
+VoiceLint should use the MIT license.
+
+MIT is a low-friction default for open-source developer tools. It is widely understood, allows commercial and non-commercial use, and keeps adoption simple.
 
 ## Core Product Boundary
 
@@ -99,6 +113,8 @@ VoiceLint v0.1 has two rule classes:
 
 Voice fit scores are deferred. They may become part of a future `report` or `audit` mode, but they are not lint rules in v0.1.
 
+The implementation should build the mechanical engine first. Semantic linting is deferred until mechanical rules, diagnostics, config loading, and hook-friendly CLI behavior are working.
+
 ## Rewriting
 
 VoiceLint v0.1 does not rewrite files.
@@ -136,7 +152,9 @@ npx voicelint init --template ai-copy-antipatterns
 
 Mechanical linting must work without an LLM provider.
 
-Semantic linting needs a judge. v0.1 should support an optional provider mode, with OpenAI as the first practical provider. Provider credentials must not live in repo config.
+Semantic linting needs a judge, but semantic provider work is deferred until the mechanical engine works.
+
+The first provider-backed semantic implementation will likely support OpenAI first. Provider credentials must not live in repo config.
 
 Machine-local examples:
 
@@ -144,7 +162,7 @@ Machine-local examples:
 OPENAI_API_KEY=...
 ```
 
-Future work may add Anthropic, local/Ollama, Gemini, and agent-assisted semantic checks.
+Future work may add Anthropic, local/Ollama, Gemini, Chinese API providers, and agent-assisted semantic checks.
 
 ## Cache
 
@@ -159,6 +177,13 @@ Recommended v0.1 cache location:
 ```
 
 Repo cache is deferred because it creates extra files, merge questions, and possible privacy concerns.
+
+The CLI should support cache controls:
+
+```bash
+voicelint changed --no-cache
+voicelint cache clear
+```
 
 ## SARIF
 

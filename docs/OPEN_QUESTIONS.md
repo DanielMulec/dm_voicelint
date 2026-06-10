@@ -4,32 +4,30 @@ This document tracks unresolved questions. Decisions should move to `DECISIONS.m
 
 ## Package Name
 
-Is `voicelint` available and desirable on npm, or should the package be scoped?
+Is `voicelint` available on npm?
 
-Options:
+Preferred order:
 
 - `voicelint`
-- `@dm/voicelint`
 - `@voicelint/cli`
+- `@dm/voicelint`
 
 ## License
 
-Which license should the project use?
-
-Likely options:
-
-- MIT
-- Apache-2.0
+Resolved: VoiceLint should use MIT.
 
 ## First Semantic Provider
 
-OpenAI is the likely first semantic provider, but this still needs an implementation decision.
+Semantic provider work is deferred until the mechanical engine works.
+
+Open questions for the semantic phase:
 
 Questions:
 
 - Which model should be the default?
 - Should semantic linting be disabled unless a provider is configured?
 - How should provider config be stored on each operating system?
+- Can agent-assisted semantic linting use the active Codex or Claude Code session reliably enough to avoid separate API keys in common workflows?
 
 ## Agent Hook Schema
 
@@ -39,7 +37,7 @@ Questions:
 
 - Should VoiceLint write `.codex/config.toml` or `.codex/hooks.json`?
 - Which Claude Code config file is safest for project-local hook setup?
-- How should `init --agent` handle existing hook files?
+- What backup filename convention should `init --agent` use before editing existing hook files?
 
 ## CI Behavior
 
@@ -58,8 +56,7 @@ The cache should probably live in the user cache directory in v0.1.
 Questions:
 
 - What exact cache path should be used on macOS, Linux, and Windows?
-- Should there be a `--no-cache` flag?
-- Should there be a `voicelint cache clear` command?
+- Which Node package should VoiceLint use to resolve platform-specific user cache directories?
 
 ## Baseline Rules
 
