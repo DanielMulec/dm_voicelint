@@ -47,4 +47,5 @@ This file is the working contract for AI coding agents in this repository.
 - Treat commit history as user-facing documentation.
 - Every commit message must use a concise subject plus `Why:`, `How:`, and `Files:` sections.
 - `Files:` must contain one bullet per changed file in that commit.
+- In a fresh clone, run `git config core.hooksPath .githooks` before relying on these repository hooks.
 - External contributors may use normal GitHub fork and pull request workflows.

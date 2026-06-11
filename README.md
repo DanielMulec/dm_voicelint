@@ -96,4 +96,10 @@ must use a concise subject plus `Why:`, `How:`, and `Files:` sections so GitHub
 history explains the intent, implementation, and touched files without relying
 on external chat logs.
 
+To enable the repository hooks in a fresh clone, run:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 See [AGENTS.md](AGENTS.md) for the working contract used by AI coding agents in this repository.
