@@ -5,11 +5,13 @@
   "license": "MIT",
   "type": "module",
   "private": false,
+  "main": "dist/cli/main.js",
   "bin": {
     "voicelint": "bin/voicelint.mjs"
   },
   "files": [
     "bin/",
+    "dist/",
     "README.md",
     "LICENSE",
     "PRODUCT.md",
@@ -27,6 +29,26 @@
     "node": ">=20"
   },
   "scripts": {
-    "smoke": "node ./bin/voicelint.mjs --help"
+    "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true });\" && tsc --project tsconfig.build.json",
+    "check:lines": "tsx ./scripts/check-file-lines.mjs",
+    "lint": "eslint ./src ./test ./scripts ./bin ./vitest.config.ts ./eslint.config.js",
+    "smoke": "node ./bin/voicelint.mjs --help",
+    "test": "vitest run",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.3",
+    "ignore": "^7.0.5",
+    "yaml": "^2.8.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vitest": "^4.0.10"
   }
 }

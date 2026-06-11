@@ -1,21 +1,37 @@
 #!/usr/bin/env node
 
-const helpText = `VoiceLint
+import { constants } from "node:fs";
+import { access } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import process from "node:process";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-VoiceLint is a CLI linting system for natural-language text in software projects.
+const binDirectoryPath = dirname(fileURLToPath(import.meta.url));
+const entryPointPath = resolve(binDirectoryPath, "../dist/cli/main.js");
 
-Status:
-  This is an early release for active development. The mechanical CLI
-  implementation is not available yet.
+const loadCompiledCli = async () => {
+  await access(entryPointPath, constants.R_OK);
+  return import(pathToFileURL(entryPointPath).href);
+};
 
-Planned commands:
-  voicelint init
-  voicelint .
-  voicelint changed
-  voicelint staged
+const writeBuildError = () => {
+  process.stderr.write(
+    "VoiceLint is not built yet. Run `npm run build` before invoking the packaged CLI.\n",
+  );
+};
 
-Project:
-  https://github.com/DanielMulec/dm_voicelint
-`;
-
-process.stdout.write(helpText);
+try {
+  const cliModule = await loadCompiledCli();
+  process.exitCode = await cliModule.runCli(
+    process.argv.slice(2),
+    process.stdin,
+    process.stdout,
+    process.stderr,
+  );
+} catch (error) {
+  writeBuildError();
+  if (error instanceof Error && error.message.length > 0) {
+    process.stderr.write(`${error.message}\n`);
+  }
+  process.exitCode = 2;
+}
