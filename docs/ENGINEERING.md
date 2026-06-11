@@ -24,12 +24,14 @@ Prefer:
 
 - pure functions for parsing, rule evaluation, and formatting
 - small modules with one responsibility
+- modular code organized by separation of concerns
 - typed result objects instead of throwing for normal control flow
 - dependency injection for file system, provider, and cache boundaries
 - fixtures for rule and diagnostic behavior
 
 Avoid:
 
+- code files longer than 400 lines
 - large command handlers
 - mixed parsing/evaluation/output logic
 - provider-specific logic inside the rule engine
@@ -58,3 +60,9 @@ Bad comment:
 Code should stay intentionally simple. As a rough standard, functions should be small enough that a reader can understand them without building a mental state machine.
 
 When a function begins to accumulate branching, split it by concept: parse input, resolve config, evaluate rules, format diagnostics, or handle process exit.
+
+## File Size
+
+Code files should stay under 400 lines.
+
+If a code file approaches that limit, split it by responsibility before adding more behavior. Good split points include CLI parsing, config loading, rule evaluation, diagnostic formatting, cache access, and provider integration.

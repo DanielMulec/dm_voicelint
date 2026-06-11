@@ -14,6 +14,8 @@ This file is the working contract for AI coding agents in this repository.
 - Implement in TypeScript.
 - Prefer strict types, small functions, explicit return types for exported functions, and typed result objects.
 - Keep parsing, rule evaluation, provider calls, caching, and formatting in separate boundaries.
+- Keep code modular by separation of concerns.
+- Keep code files under 400 lines.
 - Prefer fixtures and focused tests for rule and diagnostic behavior.
 - Do not add broad abstractions before the first CLI path proves that they remove real complexity.
 
