@@ -72,7 +72,7 @@ Included files:
 Excluded files:
 
 - deleted files
-- files filtered out by default ignores, config ignores, or unsupported
+- files filtered out by default ignores, config excludes, or unsupported
   extensions
 
 If the repo has no `HEAD` yet, `changed` should treat the working tree as the
@@ -91,7 +91,7 @@ Included files:
 Excluded files:
 
 - deleted files
-- files filtered out by default ignores, config ignores, or unsupported
+- files filtered out by default ignores, config excludes, or unsupported
   extensions
 
 If the repo has no `HEAD` yet, `staged` should compare the index against the
@@ -124,6 +124,11 @@ Safety rules:
 - missing files are created
 - existing files with identical intended content are left untouched
 - existing config or rule files with conflicting content cause exit code `2`
+- baseline file conflicts print manual resolution instructions and are never
+  overwritten
+- current implementation creates or verifies the baseline files first; Codex
+  hook setup still returns a manual follow-up instruction until hook support
+  lands
 - existing `.codex/hooks.json` is parsed and merged, never overwritten
 - a modified hook file is backed up as `<filename>.bak.<YYYYMMDDHHMMSS>`
 - if an existing hook file cannot be parsed safely, VoiceLint exits `2` with a

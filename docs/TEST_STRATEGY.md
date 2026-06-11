@@ -29,6 +29,9 @@ Current implemented tests:
 - path-mode parsing
 - `changed` and `staged` parsing
 - explicit stdin parsing and default stdin path behavior
+- repo-local config parsing and validation
+- missing-config failures for lint commands
+- baseline `init` creation, idempotence, and conflict handling
 - path discovery for `.md`, `.mdx`, and `.txt`
 - default ignored directories for discovery
 - missing-path and unsupported-file handling

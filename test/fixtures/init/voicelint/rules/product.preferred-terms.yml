@@ -1,0 +1,10 @@
+id: product.preferred-terms
+type: mechanical
+severity: warning
+description: Use approved VoiceLint terminology.
+
+terms:
+  "AI assistant": "agent"
+  "auto rewrite": "suggestion"
+
+message: "Use approved VoiceLint terminology."

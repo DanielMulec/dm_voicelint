@@ -9,10 +9,14 @@ Completed phases:
 - phase 2: TypeScript/tooling scaffold
 - phase 3: CLI parser and command shell
 - phase 4: input discovery
+- phase 5: config loading and baseline init
 
 The repository now has a compiled TypeScript CLI shell, CI, and tests. Real
 lint execution has not started yet, but the CLI can now discover the text
-sources it will later lint.
+sources it will later lint through a real repo-local config.
+
+Input discovery landed before config loading in implementation history, but
+both are now complete in `main`.
 
 ## v0.1 Delivery Order
 
@@ -20,16 +24,18 @@ sources it will later lint.
    400-line file guard.
 2. Completed: CLI argument parsing, typed command routing, and placeholder
    command shells for `init`, paths, `changed`, `staged`, and stdin.
-3. Completed: file discovery for paths, `changed`, `staged`, and stdin content,
+3. Completed: repo-local config loading, validation, and baseline
+   `voicelint init` file creation.
+4. Completed: file discovery for paths, `changed`, `staged`, and stdin content,
    plus staged reads from the Git index.
-4. Next: Markdown and plain-text segmentation with stable source locations.
-5. Next: mechanical rule loading and evaluation.
-6. Next: diagnostic assembly and `pretty` / `json` / `agent` formatting.
-7. Next: ignore handling for default ignores and Markdown/MDX inline
+5. Next: Markdown and plain-text segmentation with stable source locations.
+6. Next: mechanical rule loading and evaluation.
+7. Next: diagnostic assembly and `pretty` / `json` / `agent` formatting.
+8. Next: ignore handling for default ignores and Markdown/MDX inline
    directives.
-8. Next: `init` scaffolding and optional Codex hook setup through
+9. Next: optional Codex hook setup through
    `.codex/hooks.json`.
-9. Last: release verification, packaging, and initial npm publish.
+10. Last: release verification, packaging, and initial npm publish.
 
 The detailed tracker lives in [Implementation plan](IMPLEMENTATION_PLAN.md).
 

@@ -60,7 +60,7 @@ const writeShellCommandResult = async (
 ): Promise<number> => {
   const commandResult =
     command.commandName === "init"
-      ? executeInitCommand(command)
+      ? await executeInitCommand(command)
       : await executeLintCommand(command, input);
 
   return writeCommandResult(commandResult, output, errorOutput);

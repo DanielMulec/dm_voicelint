@@ -14,11 +14,12 @@ text without rewriting files.
 | 2. Tooling scaffold | complete | TypeScript, ESLint, Vitest, CI, file-size guard, npm scripts, compiled bin shim |
 | 3. CLI parser and command shell | complete | Typed parser, exit codes, command routing, placeholder init/lint command shells |
 | 4. Input discovery | complete | Path, `changed`, `staged`, and stdin discovery plus source reading without rule coupling |
-| 5. Segmentation and rule loading | pending | Markdown/plain-text segmentation and YAML rule loading |
-| 6. Rule evaluation and diagnostics | pending | Mechanical evaluation, source mapping, and blocking semantics |
-| 7. CLI formatting and ignores | pending | `pretty`, `json`, `agent`, default ignores, inline ignore directives |
-| 8. Init and Codex hook setup | pending | `init`, baseline rule scaffolding, `.codex/hooks.json` merge path |
-| 9. Release readiness | pending | CI checks, package verification, release checklist completion |
+| 5. Config loading and baseline init | complete | Repo-local config parsing plus baseline `voicelint init` file creation |
+| 6. Segmentation and rule loading | pending | Markdown/plain-text segmentation and YAML rule loading |
+| 7. Rule evaluation and diagnostics | pending | Mechanical evaluation, source mapping, and blocking semantics |
+| 8. CLI formatting and ignores | pending | `pretty`, `json`, `agent`, default ignores, inline ignore directives |
+| 9. Codex hook setup | pending | `.codex/hooks.json` merge path for `init --agent codex` |
+| 10. Release readiness | pending | CI checks, package verification, release checklist completion |
 
 ## Completed So Far
 
@@ -47,11 +48,22 @@ Phase 4 outputs now in repo:
 - tests for supported text discovery, default ignore directories, missing paths,
   unsupported files, changed mode, staged mode, and stdin source paths
 
+Phase 5 outputs now in repo:
+
+- repo-local config loading with YAML parse errors, schema validation, and
+  missing-config failures for lint commands
+- config-driven include and exclude globs wired into the existing discovery
+  layer
+- baseline `voicelint init` creation for `voicelint.config.yml` and the
+  baseline rule files, with idempotence and conflict reporting
+- tests for valid config parsing, invalid YAML, unknown severities, unknown rule
+  ids, missing config errors, and init creation/idempotence/conflicts
+
 ## Current Milestone
 
-The next implementation milestone is phase 5: segmentation and rule loading.
+The next implementation milestone is phase 6: segmentation and rule loading.
 
-Required outputs for phase 5:
+Required outputs for phase 6:
 
 - Markdown and plain-text segmentation
 - stable source locations

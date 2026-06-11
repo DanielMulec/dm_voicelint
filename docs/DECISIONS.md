@@ -93,6 +93,16 @@ voicelint/rules/
 
 One active profile per repo is supported in v0.1.
 
+The v0.1 config fields are:
+
+- `profile`
+- `rules`
+- `include`
+- `exclude`
+
+Unknown configured rule ids are config failures, not warnings, so misspelled
+rule overrides do not silently disable lint behavior.
+
 ## Mechanical Rule Model
 
 VoiceLint v0.1 implements mechanical rules only.

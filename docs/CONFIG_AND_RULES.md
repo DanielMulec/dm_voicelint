@@ -42,7 +42,7 @@ Default ignore globs:
 - `.next/**`
 - `.nuxt/**`
 
-Config `ignore` patterns add to this default list.
+Config `exclude` patterns add to this default list.
 
 ## Config Schema
 
@@ -50,34 +50,34 @@ Config `ignore` patterns add to this default list.
 
 | Field | Required | Type | Meaning |
 | --- | --- | --- | --- |
-| `version` | yes | number | Schema version; v0.1 uses `1` |
 | `profile` | yes | string | Active profile name for diagnostics |
-| `rulesDir` | no | string | Defaults to `voicelint/rules` |
+| `rules` | no | map of known rule id to `error`, `warning`, or `off` | Overrides per-rule severity from rule files |
 | `include` | no | list of globs | Narrows discovered files before linting |
-| `ignore` | no | list of globs | Adds repo-local ignore patterns |
-| `rules` | no | map of rule id to `error`, `warning`, or `off` | Overrides per-rule severity from rule files |
+| `exclude` | no | list of globs | Adds repo-local exclude patterns |
 
 Example:
 
 ```yaml
-version: 1
 profile: product
-rulesDir: voicelint/rules
+
+rules:
+  style.no-em-dash: error
+  style.no-en-dash: warning
+  copy.avoid-generic-product-words: warning
+  product.preferred-terms: warning
 
 include:
   - "**/*.md"
   - "**/*.mdx"
   - "**/*.txt"
 
-ignore:
-  - "archive/**"
-
-rules:
-  style.no-em-dash: error
-  style.no-en-dash: error
-  copy.avoid-generic-product-words: warning
-  product.preferred-terms: warning
+exclude:
+  - "node_modules/**"
+  - "dist/**"
+  - "coverage/**"
 ```
+
+Unknown rule ids in `rules` fail config validation instead of being ignored.
 
 ## Rule Schema
 
