@@ -8,13 +8,23 @@ VoiceLint should be distributed as a public npm package.
 
 Public npm packages are free to publish and install on the public npm registry. Private npm packages require a paid npm account. VoiceLint should start public and open-source, with GitHub as the source repository and npm as the primary package distribution channel.
 
-Preferred package name order:
+The `voicelint` package name was checked with npm on June 11, 2026. `npm view
+voicelint` returned `E404`, so the unscoped name appeared available before the
+first publish.
+
+Chosen package name:
 
 1. `voicelint`
-2. `@voicelint/cli`
-3. `@dm/voicelint`
+
+Fallback package names if the first publish fails:
+
+- `@danielmulec/voicelint`
+- `@voicelint/cli`
 
 The unscoped `voicelint` name is preferred if available because it is short and matches CLI usage. A scoped package is acceptable if the unscoped name is unavailable or if a namespace becomes useful later.
+
+The initial npm publication may use version `0.0.0` with the `next` dist-tag to
+publish an early development release without presenting it as stable.
 
 Primary commands:
 

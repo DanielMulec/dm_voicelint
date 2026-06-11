@@ -2,16 +2,6 @@
 
 This document tracks unresolved questions. Decisions should move to `DECISIONS.md` once settled.
 
-## Package Name
-
-Is `voicelint` available on npm?
-
-Preferred order:
-
-- `voicelint`
-- `@voicelint/cli`
-- `@dm/voicelint`
-
 ## Future Semantic Execution
 
 Semantic execution work is deferred until the mechanical engine works.

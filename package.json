@@ -1,0 +1,32 @@
+{
+  "name": "voicelint",
+  "version": "0.0.0",
+  "description": "A CLI linting system for natural-language text in software projects.",
+  "license": "MIT",
+  "type": "module",
+  "private": false,
+  "bin": {
+    "voicelint": "bin/voicelint.mjs"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE",
+    "PRODUCT.md",
+    "docs/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/DanielMulec/dm_voicelint.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DanielMulec/dm_voicelint/issues"
+  },
+  "homepage": "https://github.com/DanielMulec/dm_voicelint#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "smoke": "node ./bin/voicelint.mjs --help"
+  }
+}
