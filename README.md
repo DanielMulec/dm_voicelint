@@ -17,6 +17,7 @@ Implemented so far:
 - compiled npm CLI entrypoint through `bin/voicelint.mjs` -> `dist/cli/main.js`
 - typed CLI parser and command shell for `--help`, `--version`, `init`, path
   mode, `changed`, `staged`, and `--stdin`
+- input discovery for paths, `changed`, `staged`, and stdin-backed sources
 
 VoiceLint v0.1 is deterministic mechanical linting only. It does not do
 semantic judging, provider calls, or file rewriting. Diagnostics may include
@@ -24,7 +25,6 @@ suggestions, but linting never edits user text.
 
 Not implemented yet:
 
-- file discovery
 - config loading
 - segmentation
 - rule loading

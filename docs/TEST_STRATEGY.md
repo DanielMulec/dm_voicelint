@@ -29,6 +29,11 @@ Current implemented tests:
 - path-mode parsing
 - `changed` and `staged` parsing
 - explicit stdin parsing and default stdin path behavior
+- path discovery for `.md`, `.mdx`, and `.txt`
+- default ignored directories for discovery
+- missing-path and unsupported-file handling
+- changed-mode Git fixture discovery
+- staged-mode Git fixture discovery with index content reads
 - file-line guard behavior
 
 ## v0.1 Test Layers

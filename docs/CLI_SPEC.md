@@ -55,7 +55,7 @@ Behavior:
 
 - if `--stdin-file-path` is present, VoiceLint uses that path for file-type
   detection and diagnostic file names
-- if `--stdin-filepath` is absent, VoiceLint uses `<stdin>.md`
+- if `--stdin-file-path` is absent, VoiceLint uses `<stdin>`
 - path arguments and piped stdin may not be mixed; that is a usage failure with
   exit code `2`
 - `changed` and `staged` never read stdin

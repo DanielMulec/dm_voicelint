@@ -48,11 +48,20 @@ const runShellCommand = (
   input: NodeJS.ReadableStream,
   output: NodeJS.WritableStream,
   errorOutput: NodeJS.WritableStream,
-): number => {
+): Promise<number> => {
+  return writeShellCommandResult(command, input, output, errorOutput);
+};
+
+const writeShellCommandResult = async (
+  command: Exclude<ParsedCliCommand, HelpCommand | VersionCommand>,
+  input: NodeJS.ReadableStream,
+  output: NodeJS.WritableStream,
+  errorOutput: NodeJS.WritableStream,
+): Promise<number> => {
   const commandResult =
     command.commandName === "init"
       ? executeInitCommand(command)
-      : executeLintCommand(command, input);
+      : await executeLintCommand(command, input);
 
   return writeCommandResult(commandResult, output, errorOutput);
 };

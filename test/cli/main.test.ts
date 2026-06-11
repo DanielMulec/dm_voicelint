@@ -69,19 +69,25 @@ describe("runCli", () => {
   });
 
   it("defines the default stdin content path for stdin mode", async () => {
-    const { exitCode, outputText, errorText } = await runCliWithStreams(["--stdin"]);
+    const { exitCode, outputText, errorText } = await runCliWithStreams(
+      ["--stdin"],
+      "stdin body\n",
+    );
 
     expect(exitCode).toBe(2);
     expect(outputText).toBe("");
     expect(errorText).toContain("Input mode: stdin");
-    expect(errorText).toContain("Stdin file path: <stdin>.md");
+    expect(errorText).toContain("Source count: 1");
+    expect(errorText).toContain("- <stdin>");
   });
 });
 
 const runCliWithStreams = async (
   args: readonly string[],
+  inputText = "",
 ): Promise<{ exitCode: number; outputText: string; errorText: string }> => {
   const input = new PassThrough();
+  input.end(inputText);
   const output = new BufferStream();
   const errorOutput = new BufferStream();
 

@@ -13,7 +13,7 @@ text without rewriting files.
 | 1. Documentation closure | complete | CLI, config, rule, diagnostic, testing, and release docs |
 | 2. Tooling scaffold | complete | TypeScript, ESLint, Vitest, CI, file-size guard, npm scripts, compiled bin shim |
 | 3. CLI parser and command shell | complete | Typed parser, exit codes, command routing, placeholder init/lint command shells |
-| 4. Input discovery | pending | Path, `changed`, `staged`, and stdin resolution |
+| 4. Input discovery | complete | Path, `changed`, `staged`, and stdin discovery plus source reading without rule coupling |
 | 5. Segmentation and rule loading | pending | Markdown/plain-text segmentation and YAML rule loading |
 | 6. Rule evaluation and diagnostics | pending | Mechanical evaluation, source mapping, and blocking semantics |
 | 7. CLI formatting and ignores | pending | `pretty`, `json`, `agent`, default ignores, inline ignore directives |
@@ -39,17 +39,25 @@ Phase 3 outputs now in repo:
 - tests for help, version, invalid flags, invalid formats, invalid reserved
   command paths, path mode, diff modes, and stdin defaults
 
+Phase 4 outputs now in repo:
+
+- decoupled input modules for path discovery, git working-tree discovery, git
+  staged discovery, stdin reading, source reading, and path filtering
+- staged source reads from the Git index instead of the unstaged working tree
+- tests for supported text discovery, default ignore directories, missing paths,
+  unsupported files, changed mode, staged mode, and stdin source paths
+
 ## Current Milestone
 
-The next implementation milestone is phase 4: input discovery for explicit
-paths, `changed`, `staged`, and stdin-backed content.
+The next implementation milestone is phase 5: segmentation and rule loading.
 
-Required outputs for phase 4:
+Required outputs for phase 5:
 
-- path and directory input resolution
-- stdin content loading and virtual file-path handling
-- Git-backed candidate discovery shells for `changed` and `staged`
-- typed discovery results that later phases can pass to segmentation and rules
+- Markdown and plain-text segmentation
+- stable source locations
+- YAML rule loading
+- typed rule definitions that consume discovered text sources without owning
+  discovery
 
 ## Work Breakdown
 

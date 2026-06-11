@@ -8,9 +8,11 @@ Completed phases:
 - phase 1: documentation closure and v0.1 spec lock
 - phase 2: TypeScript/tooling scaffold
 - phase 3: CLI parser and command shell
+- phase 4: input discovery
 
 The repository now has a compiled TypeScript CLI shell, CI, and tests. Real
-lint execution has not started yet.
+lint execution has not started yet, but the CLI can now discover the text
+sources it will later lint.
 
 ## v0.1 Delivery Order
 
@@ -18,7 +20,8 @@ lint execution has not started yet.
    400-line file guard.
 2. Completed: CLI argument parsing, typed command routing, and placeholder
    command shells for `init`, paths, `changed`, `staged`, and stdin.
-3. Next: file discovery for paths, `changed`, `staged`, and stdin content.
+3. Completed: file discovery for paths, `changed`, `staged`, and stdin content,
+   plus staged reads from the Git index.
 4. Next: Markdown and plain-text segmentation with stable source locations.
 5. Next: mechanical rule loading and evaluation.
 6. Next: diagnostic assembly and `pretty` / `json` / `agent` formatting.
