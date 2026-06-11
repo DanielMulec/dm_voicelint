@@ -1,46 +1,99 @@
 # Engineering Standards
 
-VoiceLint should be implemented in TypeScript.
-
-The first implementation should optimize for clarity, strictness, and testability over clever abstractions.
+These standards are mandatory for all VoiceLint code.
 
 ## TypeScript
 
-Required standards:
+VoiceLint must be implemented in TypeScript.
+
+Required compiler and lint rules:
 
 - `strict: true`
-- no implicit `any`
+- `noImplicitAny: true`
 - no explicit `any`
+- no implicit `any`
 - no unchecked broad casts
 - no hidden global mutable state
-- small functions
-- low cyclomatic complexity
-- clear variable and function names
 - explicit return types for exported functions
+- typed result objects for expected control flow
 
-## Code Shape
+Implementation requirement:
 
-Prefer:
+- configure TypeScript and ESLint so violations fail locally and in CI
+- use `unknown` plus narrowing instead of `any`
+- use specific domain types instead of loose records where the shape is known
 
-- pure functions for parsing, rule evaluation, and formatting
-- small modules with one responsibility
-- modular code organized by separation of concerns
-- typed result objects instead of throwing for normal control flow
-- dependency injection for file system, provider, and cache boundaries
-- fixtures for rule and diagnostic behavior
+## File Size
 
-Avoid:
+Code files must be 400 lines or fewer.
 
-- code files longer than 400 lines
-- large command handlers
-- mixed parsing/evaluation/output logic
-- provider-specific logic inside the rule engine
-- comments that restate obvious code
-- premature plugin systems
+This is a hard limit. A code file with 401 lines is non-compliant.
+
+Required enforcement:
+
+- add an automated line-count check before the first implementation is considered complete
+- run that check in CI
+- split files before they exceed the limit
+
+Generated files are the only allowed exception, and generated files must be marked as generated.
+
+## Complexity
+
+Cyclomatic complexity must be capped at the TypeScript equivalent of Python McCabe 3.
+
+Required enforcement:
+
+- configure ESLint `complexity` with `max: 3`
+- fail lint and CI when a function exceeds complexity 3
+- split branching logic instead of raising the threshold
+
+Required code shape:
+
+- use guard clauses when they reduce branching
+- move independent decisions into separate functions
+- separate parsing, validation, evaluation, formatting, cache access, provider access, and CLI orchestration
+- keep command handlers thin; command handlers may coordinate work but must not contain rule logic
+
+## Separation Of Concerns
+
+The codebase must be modular by separation of concerns.
+
+Required boundaries:
+
+- CLI argument parsing
+- config loading and schema validation
+- file discovery and git diff input
+- Markdown/plain-text segmentation
+- rule loading
+- mechanical rule evaluation
+- diagnostic creation
+- output formatting
+- ignore handling
+- cache access
+- provider integration
+
+Modules must not mix these responsibilities. If a module needs two responsibilities, split it.
+
+## Naming And Readability
+
+Names must make the code understandable without relying on surrounding chat context.
+
+Required naming standards:
+
+- variables must name the domain concept they hold
+- functions must name the action or decision they perform
+- booleans must read as predicates, for example `isSemanticRule` or `hasBlockingDiagnostics`
+- generic names such as `data`, `item`, `thing`, `stuff`, `result2`, and `handleIt` are not acceptable unless the scope is trivial and the meaning is still obvious
 
 ## Comments
 
-Comments should explain decisions or non-obvious constraints.
+Code must be well-commented where comments improve human understanding.
+
+Required comment standards:
+
+- comment non-obvious decisions, invariants, tradeoffs, and external constraints
+- comment why a boundary exists when it prevents accidental coupling
+- do not add comments that merely restate the next line of code
 
 Good comment:
 
@@ -55,14 +108,19 @@ Bad comment:
 // Set the cache key.
 ```
 
-## Complexity
+## Testing
 
-Code should stay intentionally simple. As a rough standard, functions should be small enough that a reader can understand them without building a mental state machine.
+Tests must cover rule behavior and diagnostic behavior with focused fixtures.
 
-When a function begins to accumulate branching, split it by concept: parse input, resolve config, evaluate rules, format diagnostics, or handle process exit.
+Required test areas:
 
-## File Size
+- config parsing
+- rule loading
+- mechanical rule evaluation
+- source location mapping
+- ignore handling
+- output formatting
+- line-count enforcement
+- complexity enforcement through lint configuration
 
-Code files should stay under 400 lines.
-
-If a code file approaches that limit, split it by responsibility before adding more behavior. Good split points include CLI parsing, config loading, rule evaluation, diagnostic formatting, cache access, and provider integration.
+Semantic provider tests may use fakes or fixtures. They must not require live provider calls for normal CI.

@@ -43,7 +43,7 @@ VoiceLint v0.1 is planned to include:
 - basic ignore comments
 - optional Codex and Claude hook setup through `init --agent`
 
-VoiceLint v0.1 does not rewrite text. Diagnostics may include suggestions, but linting should not silently change files.
+VoiceLint v0.1 does not rewrite text. Diagnostics may include suggestions, but linting must never silently change files.
 
 ## Product Boundary
 
@@ -64,7 +64,7 @@ VoiceLint core is not:
 - a writing assistant
 - a rewrite engine
 
-Agent integrations should call the CLI. They should not define the product behavior.
+Agent integrations must call the CLI. They must not define the product behavior.
 
 ## Documentation
 
@@ -78,14 +78,17 @@ Agent integrations should call the CLI. They should not define the product behav
 
 ## Development
 
-The implementation should optimize for clarity, strictness, and testability over clever abstractions.
-
-Planned stack:
+Mandatory engineering standards:
 
 - TypeScript
 - `strict: true`
-- small modules with explicit boundaries
-- typed result objects for normal control flow
+- `noImplicitAny: true`
+- no explicit `any`
+- no implicit `any`
+- ESLint `complexity` with `max: 3`
+- maximum 400 lines per code file
+- modular code separated by concern
+- typed result objects for expected control flow
 - fixtures for rules and diagnostics
 
 See [AGENTS.md](AGENTS.md) for the working contract used by AI coding agents in this repository.
