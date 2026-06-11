@@ -2,8 +2,13 @@ import { readFile } from "node:fs/promises";
 import { PassThrough, Writable } from "node:stream";
 
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 
 import { runCli } from "../../src/cli/main.js";
+
+const packageManifestSchema = z.object({
+  version: z.string(),
+});
 
 class BufferStream extends Writable {
   public text = "";
@@ -24,19 +29,26 @@ describe("runCli", () => {
 
     expect(exitCode).toBe(0);
     expect(outputText).toContain("VoiceLint");
-    expect(outputText).toContain("parses the v0.1 command shell");
-    expect(outputText).toContain("voicelint --stdin");
+    expect(outputText).toContain("v0.0.5 provides the TypeScript CLI shell and input discovery");
+    expect(outputText).toContain(
+      "voicelint --stdin [--stdin-file-path PATH] [--config PATH] [--format pretty|json|agent]",
+    );
+    expect(outputText).toContain("voicelint init [--agent codex]");
+    expect(outputText).toContain("Supported input file types: .md, .mdx, .txt");
+    expect(outputText).not.toContain("parses the v0.1 command shell");
     expect(errorText).toBe("");
   });
 
   it("prints the package version from package.json", async () => {
     const { exitCode, outputText, errorText } = await runCliWithStreams(["--version"]);
-    const packageManifest = JSON.parse(await readFile(new URL("../../package.json", import.meta.url), "utf8")) as {
-      version: string;
-    };
+    const packageManifest = JSON.parse(
+      await readFile(new URL("../../package.json", import.meta.url), "utf8"),
+    ) as unknown;
+    const packageVersion = readPackageVersionFromValue(packageManifest);
 
     expect(exitCode).toBe(0);
-    expect(outputText).toBe(`${packageManifest.version}\n`);
+    expect(packageVersion).not.toBeNull();
+    expect(outputText).toBe(`${packageVersion}\n`);
     expect(errorText).toBe("");
   });
 
@@ -98,4 +110,9 @@ const runCliWithStreams = async (
     outputText: output.text,
     errorText: errorOutput.text,
   };
+};
+
+const readPackageVersionFromValue = (value: unknown): string | null => {
+  const parsedManifest = packageManifestSchema.safeParse(value);
+  return parsedManifest.success ? parsedManifest.data.version : null;
 };

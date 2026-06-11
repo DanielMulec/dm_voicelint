@@ -1,6 +1,6 @@
 {
   "name": "voicelint",
-  "version": "0.0.0",
+  "version": "0.0.5",
   "description": "A CLI linting system for natural-language text in software projects.",
   "license": "MIT",
   "type": "module",
