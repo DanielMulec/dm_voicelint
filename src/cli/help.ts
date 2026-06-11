@@ -4,18 +4,17 @@ const helpLines = [
   "VoiceLint is a CLI linting system for natural-language text in software projects.",
   "",
   "Status:",
-  "  This package now builds from TypeScript.",
+  "  This package now builds from TypeScript and parses the v0.1 command shell.",
   "  Deterministic mechanical lint execution is not implemented yet.",
   "",
   "Available now:",
   "  voicelint --help",
   "  voicelint --version",
-  "",
-  "Planned v0.1 commands:",
   "  voicelint init",
   "  voicelint .",
   "  voicelint changed",
   "  voicelint staged",
+  "  voicelint --stdin",
   "",
   "Project:",
   "  https://github.com/DanielMulec/dm_voicelint",
@@ -23,18 +22,3 @@ const helpLines = [
 ];
 
 export const createHelpText = (): string => helpLines.join("\n");
-
-export const createPlaceholderText = (tokens: readonly string[]): string =>
-  [
-    "VoiceLint CLI scaffold is installed, but lint execution is not implemented yet.",
-    `Received command: ${tokens.join(" ")}`,
-    "Use `voicelint --help` to inspect the planned command surface.",
-    "",
-  ].join("\n");
-
-export const createUsageText = (): string =>
-  [
-    "VoiceLint requires a command, path, or piped stdin input.",
-    "Use `voicelint --help` to inspect the planned command surface.",
-    "",
-  ].join("\n");
