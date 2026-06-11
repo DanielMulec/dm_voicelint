@@ -44,4 +44,7 @@ This file is the working contract for AI coding agents in this repository.
 - For maintainer-local Codex work, stay on `main` unless Daniel explicitly asks for another branch.
 - Do not create extra worktrees unless the task genuinely requires one.
 - If the repository appears dirty, verify with `git status` before acting on that assumption.
+- Treat commit history as user-facing documentation.
+- Every commit message must use a concise subject plus `Why:`, `How:`, and `Files:` sections.
+- `Files:` must contain one bullet per changed file in that commit.
 - External contributors may use normal GitHub fork and pull request workflows.

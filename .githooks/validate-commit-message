@@ -1,0 +1,132 @@
+#!/bin/sh
+set -eu
+
+message_file="$1"
+expected_files_file="$2"
+context_label="${3:-commit message}"
+
+clean_message_file="$(mktemp)"
+actual_files_file="$(mktemp)"
+expected_sorted_file="$(mktemp)"
+actual_sorted_file="$(mktemp)"
+
+cleanup() {
+  rm -f \
+    "$clean_message_file" \
+    "$actual_files_file" \
+    "$expected_sorted_file" \
+    "$actual_sorted_file"
+}
+
+trap cleanup EXIT INT TERM HUP
+
+fail() {
+  echo "dm_voicelint policy: invalid $context_label" >&2
+  echo "$1" >&2
+  exit 1
+}
+
+is_placeholder_line() {
+  case "$1" in
+    "explain why this change is needed" | \
+    "describe the implementation" | \
+    "list every changed file in this commit" | \
+    TODO* | todo* | TBD* | tbd* | \
+    "<"*">")
+      return 0
+      ;;
+  esac
+
+  return 1
+}
+
+sed '/^[[:space:]]*#/d;s/\r$//' "$message_file" > "$clean_message_file"
+
+subject_line="$(sed -n '/./{p;q;}' "$clean_message_file")"
+[ -n "$subject_line" ] || fail "subject line is required"
+
+subject_seen=0
+state="await_why"
+why_count=0
+how_count=0
+files_count=0
+
+while IFS= read -r line || [ -n "$line" ]
+do
+  if [ "$subject_seen" -eq 0 ]; then
+    if [ -z "$line" ]; then
+      continue
+    fi
+
+    subject_seen=1
+    continue
+  fi
+
+  if [ -z "$line" ]; then
+    continue
+  fi
+
+  case "$line" in
+    Why:)
+      [ "$state" = "await_why" ] || fail "Why: must come before How: and Files:"
+      state="in_why"
+      continue
+      ;;
+    How:)
+      [ "$why_count" -gt 0 ] || fail "How: requires at least one Why bullet first"
+      [ "$state" = "after_why" ] || [ "$state" = "in_why" ] || fail "How: must come after the Why section"
+      state="in_how"
+      continue
+      ;;
+    Files:)
+      [ "$how_count" -gt 0 ] || fail "Files: requires at least one How bullet first"
+      [ "$state" = "after_how" ] || [ "$state" = "in_how" ] || fail "Files: must come after the How section"
+      state="in_files"
+      continue
+      ;;
+    -\ *)
+      bullet_text="${line#- }"
+      is_placeholder_line "$bullet_text" && fail "replace template placeholder bullets before committing"
+
+      case "$state" in
+        in_why | after_why)
+          why_count=$((why_count + 1))
+          state="after_why"
+          ;;
+        in_how | after_how)
+          how_count=$((how_count + 1))
+          state="after_how"
+          ;;
+        in_files | after_files)
+          files_count=$((files_count + 1))
+          state="after_files"
+          printf '%s\n' "$bullet_text" >> "$actual_files_file"
+          ;;
+        *)
+          fail "bullets are only allowed inside Why, How, or Files sections"
+          ;;
+      esac
+      continue
+      ;;
+    *)
+      fail "unexpected line: $line"
+      ;;
+  esac
+done < "$clean_message_file"
+
+[ "$why_count" -gt 0 ] || fail "Why: must contain at least one bullet"
+[ "$how_count" -gt 0 ] || fail "How: must contain at least one bullet"
+[ "$files_count" -gt 0 ] || fail "Files: must contain at least one bullet"
+
+LC_ALL=C sort -u "$expected_files_file" | sed '/^[[:space:]]*$/d' > "$expected_sorted_file"
+LC_ALL=C sort -u "$actual_files_file" | sed '/^[[:space:]]*$/d' > "$actual_sorted_file"
+
+if ! cmp -s "$expected_sorted_file" "$actual_sorted_file"; then
+  echo "dm_voicelint policy: invalid $context_label" >&2
+  echo "Files: must list every changed file in this commit exactly once" >&2
+  echo "expected files:" >&2
+  sed 's/^/- /' "$expected_sorted_file" >&2
+  echo "listed files:" >&2
+  sed 's/^/- /' "$actual_sorted_file" >&2
+  exit 1
+fi

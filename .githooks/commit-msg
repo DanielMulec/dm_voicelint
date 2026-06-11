@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+message_file="$1"
+repo_root="$(git rev-parse --show-toplevel)"
+expected_files_file="$(mktemp)"
+
+cleanup() {
+  rm -f "$expected_files_file"
+}
+
+trap cleanup EXIT INT TERM HUP
+
+git diff --cached --name-only --no-renames > "$expected_files_file"
+
+"$repo_root/.githooks/validate-commit-message" \
+  "$message_file" \
+  "$expected_files_file" \
+  "commit message"

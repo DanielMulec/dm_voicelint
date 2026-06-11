@@ -1,0 +1,52 @@
+#!/bin/sh
+set -eu
+
+message_file="$1"
+message_source="${2:-}"
+repo_root="$(git rev-parse --show-toplevel)"
+
+case "$message_source" in
+  merge | squash | commit)
+    exit 0
+    ;;
+esac
+
+if grep -q '^Why:$' "$message_file" && \
+  grep -q '^How:$' "$message_file" && \
+  grep -q '^Files:$' "$message_file"; then
+  exit 0
+fi
+
+subject_line="$(sed -n '/^[[:space:]]*#/d;/./{p;q;}' "$message_file")"
+staged_files_file="$(mktemp)"
+files_block_file="$(mktemp)"
+template_file="$(mktemp)"
+
+cleanup() {
+  rm -f "$staged_files_file" "$files_block_file" "$template_file"
+}
+
+trap cleanup EXIT INT TERM HUP
+
+git diff --cached --name-only --no-renames > "$staged_files_file"
+
+if [ -s "$staged_files_file" ]; then
+  sed 's/^/- /' "$staged_files_file" > "$files_block_file"
+else
+  printf '%s\n' '- list every changed file in this commit' > "$files_block_file"
+fi
+
+{
+  printf '%s\n' "$subject_line"
+  printf '\n'
+  printf 'Why:\n'
+  printf '%s\n' '- explain why this change is needed'
+  printf '\n'
+  printf 'How:\n'
+  printf '%s\n' '- describe the implementation'
+  printf '\n'
+  printf 'Files:\n'
+  cat "$files_block_file"
+} > "$template_file"
+
+mv "$template_file" "$message_file"

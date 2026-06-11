@@ -91,4 +91,9 @@ Mandatory engineering standards:
 - typed result objects for expected control flow
 - fixtures for rules and diagnostics
 
+Commit history is also part of the project documentation. Commits on `main`
+must use a concise subject plus `Why:`, `How:`, and `Files:` sections so GitHub
+history explains the intent, implementation, and touched files without relying
+on external chat logs.
+
 See [AGENTS.md](AGENTS.md) for the working contract used by AI coding agents in this repository.
