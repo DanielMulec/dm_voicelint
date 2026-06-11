@@ -1,10 +1,10 @@
 # Rule Format
 
-VoiceLint v0.1 uses YAML for configuration and rules.
+VoiceLint v0.1 uses YAML for configuration and mechanical rules.
 
 Markdown rule files are deferred. YAML keeps rules structured, parseable, testable, and easier for agents to modify safely.
 
-## Mechanical Rule Example
+## Mechanical Rule Examples
 
 ```yaml
 id: style.no-em-dash
@@ -18,7 +18,35 @@ match:
 message: "Use a comma, colon, parentheses, or a sentence break instead of an em dash."
 ```
 
-## Semantic Rule Example
+```yaml
+id: product.preferred-terms
+type: mechanical
+severity: warning
+description: Use the approved product terminology.
+
+terms:
+  "AI assistant": "agent"
+  "auto rewrite": "suggestion"
+
+message: "Use approved VoiceLint terminology."
+```
+
+```yaml
+id: copy.avoid-seamless
+type: mechanical
+severity: warning
+description: Avoid generic product-copy words that do not name a concrete workflow.
+
+substitution:
+  "seamless": "specific"
+  "revolutionary": "specific"
+
+message: "Replace generic product-copy language with a concrete claim."
+```
+
+## Future Semantic Rule Example
+
+Semantic rules are deferred until after the mechanical v0.1 path is working.
 
 ```yaml
 id: voice.no-fake-empathy
@@ -45,7 +73,7 @@ good:
   - "Export the file as CSV and upload it again."
 ```
 
-## Semantic Verdicts
+## Future Semantic Verdicts
 
 Semantic judges return one of three verdicts:
 
@@ -91,7 +119,11 @@ Example:
 
 ## Rule Tests
 
-Semantic rules should be testable against examples.
+The v0.1 implementation should use focused internal fixtures for mechanical rule
+and diagnostic behavior.
+
+A public `voicelint test` command is deferred until the rule authoring workflow
+needs stable good/bad fixtures, especially for semantic rules.
 
 Example command:
 

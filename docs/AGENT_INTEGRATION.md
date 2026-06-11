@@ -26,6 +26,10 @@ npx voicelint init --agent claude
 
 `init --agent` may create project-local hook files, but it must not silently edit global user configuration.
 
+Hook setup should be implemented after the base CLI path is stable: config
+loading, input discovery, segmentation, mechanical diagnostics, and output
+formatting should work first.
+
 The init output should remind the user that agent projects may need to be trusted before project-local hooks run.
 
 Example reminder:
@@ -68,17 +72,20 @@ Claude Code also supports hooks that can run commands and block actions.
 
 VoiceLint should provide a Claude setup path, but the core CLI should not depend on Claude-specific features.
 
-## Agent-Assisted Semantic Checks
+## Future Agent-Session Semantic Checks
 
-Agent-assisted semantic checks are a research direction, not part of the mechanical MVP.
+Agent-session semantic checks are a preferred research direction, not part of the
+mechanical v0.1 MVP.
 
 The idea:
 
 1. VoiceLint detects that semantic checks are required.
-2. A hook blocks progress and returns a structured task to the agent.
-3. The agent evaluates the text against the semantic rule and continues only after addressing issues.
+2. A hook or agent integration returns a structured lint task to the active Codex, Claude Code, Antigravity, or similar session.
+3. The current agent session evaluates the text against the semantic rule and continues only after addressing issues.
 
-This may reduce the need for separate LLM API keys in agent-first workflows, but it has tradeoffs:
+This is preferred for common agent-first workflows because it may avoid requiring
+a separate external LLM API call when a capable agent session is already active.
+It has tradeoffs:
 
 - It is harder to test than provider-backed semantic linting.
 - It is harder to cache.
@@ -88,10 +95,11 @@ This may reduce the need for separate LLM API keys in agent-first workflows, but
 
 The implementation should start with deterministic linting. Once the mechanical engine works, semantic linting should be evaluated in two tracks:
 
-1. provider-backed semantic linting
-2. agent-assisted semantic linting through active Codex, Claude Code, or similar sessions
+1. agent-session semantic linting through active Codex, Claude Code, Antigravity, or similar sessions
+2. provider-backed semantic linting for CI, non-agent workflows, and reproducible automation
 
-The product preference is to make agent-assisted semantic linting work if it can be made reliable enough, because it may avoid separate API keys in agent-first workflows.
+The product preference is to make agent-session semantic linting work if it can
+be made reliable enough.
 
 ## Hook Output
 

@@ -58,7 +58,7 @@ Required code shape:
 
 The codebase must be modular by separation of concerns.
 
-Required boundaries:
+Required boundaries for implemented product areas:
 
 - CLI argument parsing
 - config loading and schema validation
@@ -69,10 +69,12 @@ Required boundaries:
 - diagnostic creation
 - output formatting
 - ignore handling
-- cache access
-- provider integration
+- future cache access
+- future provider integration
 
-Modules must not mix these responsibilities. If a module needs two responsibilities, split it.
+Modules must not mix these responsibilities. If a module needs two
+responsibilities, split it. Future boundaries do not need implementation before
+their product areas are in scope.
 
 ## Naming And Readability
 
@@ -123,4 +125,4 @@ Required test areas:
 - line-count enforcement
 - complexity enforcement through lint configuration
 
-Semantic provider tests may use fakes or fixtures. They must not require live provider calls for normal CI.
+Future semantic provider tests may use fakes or fixtures. They must not require live provider calls for normal CI.

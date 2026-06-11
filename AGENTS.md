@@ -15,7 +15,7 @@ This file is the working contract for AI coding agents in this repository.
 - Enforce strict typing: `strict: true`, `noImplicitAny: true`, no explicit `any`, no implicit `any`, no unchecked broad casts.
 - Enforce the TypeScript equivalent of Python McCabe 3: ESLint `complexity` must be configured with `max: 3`, and violations must fail lint/CI.
 - Enforce a hard maximum of 400 lines per code file. A code file with 401 lines is non-compliant.
-- Keep the codebase modular by separation of concerns: CLI parsing, config loading, input discovery, segmentation, rule loading, rule evaluation, diagnostics, formatting, ignore handling, cache access, and provider access belong in separate boundaries.
+- Keep the codebase modular by separation of concerns: CLI parsing, config loading, input discovery, segmentation, rule loading, rule evaluation, diagnostics, formatting, ignore handling, and later cache/provider access belong in separate boundaries.
 - Use clear variable and function names that expose the domain concept or action.
 - Add comments for non-obvious decisions, invariants, tradeoffs, and external constraints. Do not add comments that merely restate the code.
 - Use typed result objects for expected control flow.
@@ -26,10 +26,11 @@ This file is the working contract for AI coding agents in this repository.
 
 - Repo-local configuration is the default.
 - Mechanical linting must work without an LLM provider.
-- Semantic linting is optional and provider-backed.
+- Semantic linting is deferred until after the mechanical v0.1 path works.
+- Agent-session semantic linting is the preferred future research path for agent-first workflows; provider-backed semantic linting is a possible path for CI and non-agent workflows.
 - Semantic `uncertain` verdicts must not block progress.
-- Provider credentials must not live in repo config.
-- Cache semantic checks in a local user cache, not in the repo, unless a later decision changes that.
+- Provider credentials must not live in repo config if provider-backed semantic linting is added.
+- If semantic checks are cached later, cache them in a local user cache, not in the repo, unless a later decision changes that.
 
 ## Documentation Hygiene
 

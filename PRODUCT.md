@@ -21,10 +21,10 @@ It should help humans and AI agents share the same definition of whether a piece
 
 - Lint Markdown, MDX, plain text, and agent-generated output in a local repository.
 - Run deterministic rules for punctuation, terminology, capitalization, banned phrases, and similar checks.
-- Run semantic rules for voice antipatterns that need meaning and context.
-- Integrate with agent hooks so generated or edited text is checked automatically.
+- Later, run semantic rules for voice antipatterns that need meaning and context.
+- Later, integrate with agent hooks so generated or edited text is checked automatically.
 - Return diagnostics that are readable by humans and structured enough for agents, editors, and CI.
-- Test semantic rules against good and bad examples.
+- Later, test semantic rules against good and bad examples.
 
 ## Non-Goals
 
@@ -46,6 +46,10 @@ npx voicelint staged
 ```
 
 Agent integrations, Git hooks, editor integrations, and future dashboards should all call the same CLI.
+
+The first implementation should prove the deterministic CLI path before adding
+semantic linting, agent hook setup, provider-backed judging, or semantic rule
+test commands.
 
 ## Documentation Map
 

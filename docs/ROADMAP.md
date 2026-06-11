@@ -16,12 +16,13 @@ The MVP should include:
 - pretty, JSON, and agent output formats
 - diagnostics with line locations
 - basic ignore comments
-- optional Codex and Claude hook setup through `init --agent`
+- optional Codex and Claude hook setup through `init --agent`, implemented only after the base CLI path is stable
 
 ## Deferred
 
 - semantic rule runner
 - provider-backed structured semantic output
+- agent-session semantic linting through active Codex, Claude Code, Antigravity, or similar sessions
 - semantic rule fixtures and `voicelint test`
 - local user cache for semantic checks
 - multiple profiles per repo
@@ -37,8 +38,19 @@ The MVP should include:
 - Anthropic provider
 - Gemini provider
 - Chinese API providers
-- agent-assisted semantic linting
 - safe mechanical autofix
+
+## Implementation Order
+
+The first implementation should prove the deterministic path before hook setup:
+
+1. CLI, config loading, and strict schema validation.
+2. File discovery, git input modes, and stdin handling.
+3. Markdown/plain-text segmentation with stable source locations.
+4. Mechanical rule loading and evaluation.
+5. Diagnostics and pretty, JSON, and agent output.
+6. Ignore handling.
+7. Optional Codex and Claude hook setup through `init --agent`.
 
 ## Speculative
 

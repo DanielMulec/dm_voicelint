@@ -46,8 +46,7 @@ VoiceLint core is:
 - repo-local configuration
 - rules
 - diagnostics
-- cache
-- optional semantic provider integration
+- future semantic execution through agent-session or provider-backed checks
 
 VoiceLint core is not:
 
@@ -106,14 +105,30 @@ overrides:
 
 ## Rule Types
 
-VoiceLint v0.1 has two rule classes:
+VoiceLint v0.1 implements mechanical rules only.
 
-- **Mechanical rules**: deterministic checks that do not need an LLM.
-- **Semantic rules**: LLM-judged checks for meaning, context, and voice antipatterns.
+Mechanical rules are deterministic checks that do not need an LLM. They should
+cover anything that can be identified without understanding the full semantic
+meaning of the text, including punctuation, terminology, capitalization, banned
+phrases, required terms, and simple pattern matches.
+
+Semantic rules are deferred until after v0.1. They cover meaning, context, and
+voice antipatterns that cannot be judged safely through deterministic matching.
 
 Voice fit scores are deferred. They may become part of a future `report` or `audit` mode, but they are not lint rules in v0.1.
 
-The implementation should build the mechanical engine first. Semantic linting is deferred until mechanical rules, diagnostics, config loading, and hook-friendly CLI behavior are working.
+The implementation should build the mechanical engine first. Semantic linting is
+deferred until mechanical rules, diagnostics, config loading, discovery,
+formatting, and hook-friendly CLI behavior are working.
+
+Initial mechanical rule kinds:
+
+- `pattern`: flag literal strings or regular expressions.
+- `terms`: enforce preferred terminology and capitalization.
+- `substitution`: flag discouraged wording and attach replacement suggestions.
+
+Occurrence-count rules are deferred unless a concrete v0.1 use case proves they
+are needed.
 
 ## Rewriting
 
@@ -123,9 +138,11 @@ Diagnostics may include suggestions, but linting never changes text. This is int
 
 Potential future autofix support is limited to mechanically safe rules, such as punctuation or whitespace. Semantic rewrite remains out of scope unless explicitly reconsidered.
 
-## Semantic Errors
+## Future Semantic Errors
 
-Users may configure semantic rules as errors, but v0.1 should make this an explicit choice.
+Semantic linting is not part of v0.1. When semantic rules are added later, users
+may configure semantic rules as errors, but blocking behavior should be an
+explicit choice.
 
 Recommended behavior:
 
@@ -148,13 +165,23 @@ npx voicelint init --template docs
 npx voicelint init --template ai-copy-antipatterns
 ```
 
-## Semantic Provider
+## Future Semantic Execution
 
 Mechanical linting must work without an LLM provider.
 
-Semantic linting needs a judge, but semantic provider work is deferred until the mechanical engine works.
+Semantic linting needs a judge, but all semantic execution work is deferred until
+the mechanical engine works.
 
-The first provider-backed semantic implementation will likely support OpenAI first. Provider credentials must not live in repo config.
+The preferred research direction is agent-session semantic linting: VoiceLint
+would use the active Codex, Claude Code, Antigravity, or similar chat/session as
+part of the lint workflow instead of requiring a separate external LLM API call
+for common agent-first usage.
+
+Provider-backed semantic linting remains a possible execution path for CI,
+non-agent workflows, and reproducible automation. Provider credentials must not
+live in repo config.
+
+If a provider-backed implementation is added, OpenAI is a likely first provider.
 
 Machine-local examples:
 
@@ -162,15 +189,16 @@ Machine-local examples:
 OPENAI_API_KEY=...
 ```
 
-Future work may add Anthropic, local/Ollama, Gemini, Chinese API providers, and agent-assisted semantic checks.
+Future work may add Anthropic, local/Ollama, Gemini, Chinese API providers, and
+agent-session semantic checks.
 
-## Cache
+## Future Semantic Cache
 
-Semantic linting should use a local cache.
+Semantic linting should eventually use a local cache.
 
 The cache avoids repeated LLM calls for unchanged text and unchanged rules. It improves speed, reduces cost, and makes hook usage more practical.
 
-Recommended v0.1 cache location:
+Possible cache location:
 
 ```text
 ~/Library/Caches/voicelint
@@ -178,7 +206,7 @@ Recommended v0.1 cache location:
 
 Repo cache is deferred because it creates extra files, merge questions, and possible privacy concerns.
 
-The CLI should support cache controls:
+Future CLI cache controls:
 
 ```bash
 voicelint changed --no-cache

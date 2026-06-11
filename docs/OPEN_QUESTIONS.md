@@ -12,22 +12,24 @@ Preferred order:
 - `@voicelint/cli`
 - `@dm/voicelint`
 
-## First Semantic Provider
+## Future Semantic Execution
 
-Semantic provider work is deferred until the mechanical engine works.
+Semantic execution work is deferred until the mechanical engine works.
 
 Open questions for the semantic phase:
 
 Questions:
 
+- Can active Codex, Claude Code, Antigravity, or similar sessions provide a reliable enough semantic lint loop to avoid separate API keys in common agent-first workflows?
 - Which model should be the default?
-- Should semantic linting be disabled unless a provider is configured?
+- Should provider-backed semantic linting be disabled unless a provider is configured?
 - How should provider config be stored on each operating system?
-- Can agent-assisted semantic linting use the active Codex or Claude Code session reliably enough to avoid separate API keys in common workflows?
 
 ## Agent Hook Schema
 
 Codex and Claude hook schemas should be verified during implementation.
+
+Hook setup should be designed after the base CLI path is stable.
 
 Questions:
 
@@ -47,7 +49,8 @@ Likely starting point:
 
 ## Cache Details
 
-The cache should probably live in the user cache directory in v0.1.
+Cache work is deferred until semantic linting exists. The cache should probably
+live in the user cache directory when it is added.
 
 Questions:
 

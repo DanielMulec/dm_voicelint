@@ -33,17 +33,18 @@ VoiceLint v0.1 is planned to include:
 - repo-local `voicelint.config.yml`
 - YAML rule files
 - deterministic mechanical rules
-- optional semantic rules with provider-backed structured output
 - Markdown-oriented text segmentation
 - file path, `changed`, `staged`, and `stdin` input modes
 - pretty, JSON, and agent-friendly output formats
 - line-based diagnostics
-- local cache for semantic checks
-- rule fixtures and `voicelint test`
+- focused internal fixtures for rule and diagnostic behavior
 - basic ignore comments
-- optional Codex and Claude hook setup through `init --agent`
+- optional Codex and Claude hook setup through `init --agent`, after the base CLI path is stable
 
 VoiceLint v0.1 does not rewrite text. Diagnostics may include suggestions, but linting must never silently change files.
+
+Semantic linting, semantic rule fixtures, local semantic caching, and a public
+`voicelint test` command are planned after the mechanical v0.1 path is working.
 
 ## Product Boundary
 
@@ -53,8 +54,7 @@ VoiceLint core is:
 - repo-local configuration
 - rules
 - diagnostics
-- cache
-- optional semantic provider integration
+- future semantic checks through agent-session or provider-backed execution
 
 VoiceLint core is not:
 
