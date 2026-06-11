@@ -2,25 +2,31 @@
 
 ## Current State
 
-Completed planning phases:
+Completed phases:
 
 - phase 0: repo intake and implementation contract lock
 - phase 1: documentation closure and v0.1 spec lock
+- phase 2: TypeScript/tooling scaffold
+- phase 3: CLI parser and command shell
 
-Implementation has not started beyond the help-only CLI stub.
+The repository now has a compiled TypeScript CLI shell, CI, and tests. Real
+lint execution has not started yet.
 
 ## v0.1 Delivery Order
 
-1. Tooling scaffold: TypeScript, ESLint, test runner, and the 400-line file
-   guard.
-2. CLI argument parsing and config loading.
-3. File discovery for paths, `changed`, `staged`, and stdin.
-4. Markdown and plain-text segmentation with stable source locations.
-5. Mechanical rule loading and evaluation.
-6. Diagnostic assembly and `pretty` / `json` / `agent` formatting.
-7. Ignore handling for default ignores and Markdown/MDX inline directives.
-8. `init` scaffolding and optional Codex hook setup through `.codex/hooks.json`.
-9. Release verification, packaging, and initial npm publish.
+1. Completed: tooling scaffold with TypeScript, ESLint, Vitest, CI, and the
+   400-line file guard.
+2. Completed: CLI argument parsing, typed command routing, and placeholder
+   command shells for `init`, paths, `changed`, `staged`, and stdin.
+3. Next: file discovery for paths, `changed`, `staged`, and stdin content.
+4. Next: Markdown and plain-text segmentation with stable source locations.
+5. Next: mechanical rule loading and evaluation.
+6. Next: diagnostic assembly and `pretty` / `json` / `agent` formatting.
+7. Next: ignore handling for default ignores and Markdown/MDX inline
+   directives.
+8. Next: `init` scaffolding and optional Codex hook setup through
+   `.codex/hooks.json`.
+9. Last: release verification, packaging, and initial npm publish.
 
 The detailed tracker lives in [Implementation plan](IMPLEMENTATION_PLAN.md).
 

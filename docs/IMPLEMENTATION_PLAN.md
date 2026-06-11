@@ -11,26 +11,45 @@ text without rewriting files.
 | --- | --- | --- |
 | 0. Repo intake and contract lock | complete | Repo understanding and v0.1 boundary brief |
 | 1. Documentation closure | complete | CLI, config, rule, diagnostic, testing, and release docs |
-| 2. Tooling scaffold | pending | TypeScript, ESLint, test runner, file-size guard, npm scripts |
-| 3. Input discovery | pending | Path, `changed`, `staged`, and stdin resolution |
-| 4. Segmentation and rule loading | pending | Markdown/plain-text segmentation and YAML rule loading |
-| 5. Rule evaluation and diagnostics | pending | Mechanical evaluation, source mapping, and blocking semantics |
-| 6. CLI formatting and ignores | pending | `pretty`, `json`, `agent`, default ignores, inline ignore directives |
-| 7. Init and Codex hook setup | pending | `init`, baseline rule scaffolding, `.codex/hooks.json` merge path |
-| 8. Release readiness | pending | CI checks, package verification, release checklist completion |
+| 2. Tooling scaffold | complete | TypeScript, ESLint, Vitest, CI, file-size guard, npm scripts, compiled bin shim |
+| 3. CLI parser and command shell | complete | Typed parser, exit codes, command routing, placeholder init/lint command shells |
+| 4. Input discovery | pending | Path, `changed`, `staged`, and stdin resolution |
+| 5. Segmentation and rule loading | pending | Markdown/plain-text segmentation and YAML rule loading |
+| 6. Rule evaluation and diagnostics | pending | Mechanical evaluation, source mapping, and blocking semantics |
+| 7. CLI formatting and ignores | pending | `pretty`, `json`, `agent`, default ignores, inline ignore directives |
+| 8. Init and Codex hook setup | pending | `init`, baseline rule scaffolding, `.codex/hooks.json` merge path |
+| 9. Release readiness | pending | CI checks, package verification, release checklist completion |
 
-## Current Milestone
+## Completed So Far
 
-The next implementation milestone is phase 2: build the TypeScript and test
-scaffold without introducing production rule behavior yet.
-
-Required outputs for phase 2:
+Phase 2 outputs now in repo:
 
 - `tsconfig.json` with strict mode
 - ESLint config with `complexity: ["error", 3]`
-- test runner and fixture layout
+- Vitest test runner and initial CLI/tooling tests
 - line-count enforcement for code files
-- npm scripts for smoke, lint, typecheck, tests, and line-count checks
+- npm scripts for smoke, lint, typecheck, tests, line-count checks, and build
+- CI workflow that runs install, typecheck, lint, test, line-count, build, and smoke
+
+Phase 3 outputs now in repo:
+
+- typed CLI parser and argument routing
+- explicit `exit-code`, `result`, and `error` modules
+- command shells for `init` and lint input modes
+- tests for help, version, invalid flags, invalid formats, invalid reserved
+  command paths, path mode, diff modes, and stdin defaults
+
+## Current Milestone
+
+The next implementation milestone is phase 4: input discovery for explicit
+paths, `changed`, `staged`, and stdin-backed content.
+
+Required outputs for phase 4:
+
+- path and directory input resolution
+- stdin content loading and virtual file-path handling
+- Git-backed candidate discovery shells for `changed` and `staged`
+- typed discovery results that later phases can pass to segmentation and rules
 
 ## Work Breakdown
 
@@ -38,8 +57,8 @@ Required outputs for phase 2:
 
 - keep the command surface limited to paths, `changed`, `staged`, `init`, and
   stdin
-- make no-argument interactive invocation a usage error
-- keep git-backed discovery separate from CLI parsing
+- keep git-backed discovery separate from CLI parsing and command routing
+- preserve the current typed parser shell while adding real input discovery
 
 ### Config and Rules
 

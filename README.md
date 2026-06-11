@@ -8,12 +8,30 @@ behavior, and no silent rewriting.
 
 ## Status
 
-The repository contract for v0.1 is now documented. Production implementation
-has not started beyond the CLI help stub in `bin/voicelint.mjs`.
+The repository contract for v0.1 is documented, and the first implementation
+phases are in place.
+
+Implemented so far:
+
+- TypeScript build, lint, test, and CI scaffold
+- compiled npm CLI entrypoint through `bin/voicelint.mjs` -> `dist/cli/main.js`
+- typed CLI parser and command shell for `--help`, `--version`, `init`, path
+  mode, `changed`, `staged`, and `--stdin`
 
 VoiceLint v0.1 is deterministic mechanical linting only. It does not do
 semantic judging, provider calls, or file rewriting. Diagnostics may include
 suggestions, but linting never edits user text.
+
+Not implemented yet:
+
+- file discovery
+- config loading
+- segmentation
+- rule loading
+- rule evaluation
+- diagnostics
+- ignore handling
+- init scaffolding
 
 ## Planned CLI Shape
 
@@ -22,6 +40,7 @@ npx voicelint init
 npx voicelint .
 npx voicelint changed
 npx voicelint staged
+npx voicelint --stdin
 ```
 
 ## v0.1 Scope

@@ -7,13 +7,29 @@ test strategy is built around deterministic mechanical behavior.
 
 ## Current Repository Verification
 
-The repository currently has only a smoke check because production
-implementation has not started.
+The repository now has real tooling verification even though lint execution is
+still a shell.
 
-Required verification for the documentation-closure phase:
+Current implemented verification commands:
 
+- `npm run typecheck`
+- `npm run lint`
+- `npm run test`
+- `npm run check:lines`
+- `npm run build`
 - `npm run smoke`
-- `git diff --check`
+
+Current implemented tests:
+
+- CLI help output
+- CLI version output
+- invalid reserved command paths
+- invalid flags
+- invalid formats
+- path-mode parsing
+- `changed` and `staged` parsing
+- explicit stdin parsing and default stdin path behavior
+- file-line guard behavior
 
 ## v0.1 Test Layers
 

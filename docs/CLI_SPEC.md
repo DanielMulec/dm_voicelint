@@ -5,7 +5,7 @@
 VoiceLint v0.1 supports this command surface:
 
 ```text
-voicelint [path ...] [--config PATH] [--format pretty|json|agent] [--stdin-filepath PATH]
+voicelint [path ...] [--config PATH] [--format pretty|json|agent] [--stdin-file-path PATH]
 voicelint changed [--config PATH] [--format pretty|json|agent]
 voicelint staged [--config PATH] [--format pretty|json|agent]
 voicelint init [--agent codex]
@@ -27,7 +27,7 @@ Rules:
 | --- | --- | --- |
 | `--config PATH` | Repo-local config path | Defaults to `voicelint.config.yml` in the current working directory |
 | `--format FORMAT` | Output formatter | Allowed values: `pretty`, `json`, `agent`; default is `pretty` |
-| `--stdin-filepath PATH` | Virtual path for stdin | Valid only in stdin mode; used for file-type detection and diagnostics |
+| `--stdin-file-path PATH` | Virtual path for stdin | Valid only in stdin mode; used for file-type detection and diagnostics |
 | `--help` | Print usage | Exits `0` |
 | `--version` | Print package version | Exits `0` |
 
@@ -53,7 +53,7 @@ Stdin mode is active only when:
 
 Behavior:
 
-- if `--stdin-filepath` is present, VoiceLint uses that path for file-type
+- if `--stdin-file-path` is present, VoiceLint uses that path for file-type
   detection and diagnostic file names
 - if `--stdin-filepath` is absent, VoiceLint uses `<stdin>.md`
 - path arguments and piped stdin may not be mixed; that is a usage failure with
