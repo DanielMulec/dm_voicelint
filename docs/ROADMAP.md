@@ -1,8 +1,32 @@
 # Roadmap
 
-## MVP
+## Current State
 
-The MVP should include:
+Completed planning phases:
+
+- phase 0: repo intake and implementation contract lock
+- phase 1: documentation closure and v0.1 spec lock
+
+Implementation has not started beyond the help-only CLI stub.
+
+## v0.1 Delivery Order
+
+1. Tooling scaffold: TypeScript, ESLint, test runner, and the 400-line file
+   guard.
+2. CLI argument parsing and config loading.
+3. File discovery for paths, `changed`, `staged`, and stdin.
+4. Markdown and plain-text segmentation with stable source locations.
+5. Mechanical rule loading and evaluation.
+6. Diagnostic assembly and `pretty` / `json` / `agent` formatting.
+7. Ignore handling for default ignores and Markdown/MDX inline directives.
+8. `init` scaffolding and optional Codex hook setup through `.codex/hooks.json`.
+9. Release verification, packaging, and initial npm publish.
+
+The detailed tracker lives in [Implementation plan](IMPLEMENTATION_PLAN.md).
+
+## v0.1 Scope
+
+The first release should include:
 
 - public npm package
 - CLI runnable through `npx`
@@ -10,20 +34,20 @@ The MVP should include:
 - repo-local `voicelint.config.yml`
 - one active profile per repo
 - YAML rule files
-- deterministic rule runner
-- Markdown paragraph/list/heading segmentation
-- input modes for file paths, `changed`, `staged`, and `stdin`
-- pretty, JSON, and agent output formats
-- diagnostics with line locations
-- basic ignore comments
-- optional Codex and Claude hook setup through `init --agent`, implemented only after the base CLI path is stable
+- deterministic mechanical linting only
+- supported file types `.md`, `.mdx`, `.txt`
+- input modes for paths, `changed`, `staged`, and stdin
+- pretty, JSON, and agent output
+- line-based diagnostics with optional suggestions
+- basic ignore comments for Markdown and MDX
+- optional project-local Codex hook setup
 
-## Deferred
+## Deferred After v0.1
 
 - semantic rule runner
-- provider-backed structured semantic output
-- agent-session semantic linting through active Codex, Claude Code, Antigravity, or similar sessions
-- semantic rule fixtures and `voicelint test`
+- provider-backed semantic output
+- agent-session semantic linting
+- semantic rule fixtures and a public `voicelint test`
 - local user cache for semantic checks
 - multiple profiles per repo
 - file-based profile overrides
@@ -40,30 +64,10 @@ The MVP should include:
 - Chinese API providers
 - safe mechanical autofix
 
-## Implementation Order
-
-The first implementation should prove the deterministic path before hook setup:
-
-1. CLI, config loading, and strict schema validation.
-2. File discovery, git input modes, and stdin handling.
-3. Markdown/plain-text segmentation with stable source locations.
-4. Mechanical rule loading and evaluation.
-5. Diagnostics and pretty, JSON, and agent output.
-6. Ignore handling.
-7. Optional Codex and Claude hook setup through `init --agent`.
-
-## Speculative
-
-- hosted dashboard for teams
-- team rule management
-
-These may become useful if teams need cross-repo rule distribution, review history, or governance. They are not part of the current roadmap.
-
 ## Probably Out Of Scope
 
 - semantic rewriting as part of linting
 - hidden global profile selection
-- grammar checking as a primary product goal
-- replacing Vale or textlint for teams that only need deterministic prose linting
+- grammar checking as the main product goal
 - native macOS menu bar app
 - Raycast extension

@@ -2,13 +2,20 @@
 
 VoiceLint is a linting system for natural-language text in software projects.
 
-It is meant to feel closer to ESLint than to a writing assistant: repo-local configuration, explicit rules, predictable diagnostics, hook-friendly CLI behavior, and no silent rewriting.
+It is meant to feel closer to ESLint than to a writing assistant: repo-local
+configuration, explicit rules, predictable diagnostics, hook-friendly CLI
+behavior, and no silent rewriting.
 
 ## Status
 
-This repository is in the product and architecture phase. The first implementation is planned as a public TypeScript CLI package for npm.
+The repository contract for v0.1 is now documented. Production implementation
+has not started beyond the CLI help stub in `bin/voicelint.mjs`.
 
-The intended command shape is:
+VoiceLint v0.1 is deterministic mechanical linting only. It does not do
+semantic judging, provider calls, or file rewriting. Diagnostics may include
+suggestions, but linting never edits user text.
+
+## Planned CLI Shape
 
 ```bash
 npx voicelint init
@@ -17,34 +24,29 @@ npx voicelint changed
 npx voicelint staged
 ```
 
-These commands are not implemented yet.
+## v0.1 Scope
 
-## Why
-
-AI agents can produce a lot of text quickly: product copy, docs, changelogs, prompts, issue comments, release notes, and UI strings. The problem is not only whether the text is grammatical. The problem is whether it fits the product.
-
-VoiceLint turns product voice, brand voice, and editorial judgment into versioned, testable lint rules.
-
-## Scope
-
-VoiceLint v0.1 is planned to include:
-
-- a CLI runnable through `npx`
+- public npm CLI package
 - repo-local `voicelint.config.yml`
 - YAML rule files
 - deterministic mechanical rules
-- Markdown-oriented text segmentation
-- file path, `changed`, `staged`, and `stdin` input modes
+- supported file types: `.md`, `.mdx`, `.txt`
+- input modes for file paths, `changed`, `staged`, and stdin
 - pretty, JSON, and agent-friendly output formats
-- line-based diagnostics
-- focused internal fixtures for rule and diagnostic behavior
-- basic ignore comments
-- optional Codex and Claude hook setup through `init --agent`, after the base CLI path is stable
+- line-based diagnostics with optional suggestions
+- basic ignore comments for Markdown and MDX
+- optional project-local Codex hook setup through `init --agent codex`
 
-VoiceLint v0.1 does not rewrite text. Diagnostics may include suggestions, but linting must never silently change files.
+## Deferred After v0.1
 
-Semantic linting, semantic rule fixtures, local semantic caching, and a public
-`voicelint test` command are planned after the mechanical v0.1 path is working.
+- semantic linting
+- provider-backed judging
+- agent-session semantic linting
+- semantic caches
+- multi-profile overrides
+- SARIF output
+- public `voicelint test`
+- mechanical autofix
 
 ## Product Boundary
 
@@ -54,7 +56,7 @@ VoiceLint core is:
 - repo-local configuration
 - rules
 - diagnostics
-- future semantic checks through agent-session or provider-backed execution
+- future semantic execution through agent-session or provider-backed checks
 
 VoiceLint core is not:
 
@@ -64,14 +66,20 @@ VoiceLint core is not:
 - a writing assistant
 - a rewrite engine
 
-Agent integrations must call the CLI. They must not define the product behavior.
+Agent integrations must call the CLI. They do not define product behavior.
 
 ## Documentation
 
 - [Product overview](PRODUCT.md)
+- [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
+- [CLI spec](docs/CLI_SPEC.md)
+- [Config and rules](docs/CONFIG_AND_RULES.md)
+- [Diagnostic model](docs/DIAGNOSTIC_MODEL.md)
+- [Test strategy](docs/TEST_STRATEGY.md)
+- [Release checklist](docs/RELEASE_CHECKLIST.md)
 - [Decisions](docs/DECISIONS.md)
-- [Rule format](docs/RULE_FORMAT.md)
-- [Agent integration](docs/AGENT_INTEGRATION.md)
+- [Rule format background](docs/RULE_FORMAT.md)
+- [Agent integration background](docs/AGENT_INTEGRATION.md)
 - [Engineering standards](docs/ENGINEERING.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Open questions](docs/OPEN_QUESTIONS.md)
@@ -91,10 +99,9 @@ Mandatory engineering standards:
 - typed result objects for expected control flow
 - fixtures for rules and diagnostics
 
-Commit history is also part of the project documentation. Commits on `main`
-must use a concise subject plus `Why:`, `How:`, and `Files:` sections so GitHub
-history explains the intent, implementation, and touched files without relying
-on external chat logs.
+Commit history is part of the project documentation. Commits on `main` must use
+a concise subject plus `Why:`, `How:`, and `Files:` sections so GitHub history
+explains intent and implementation without external chat logs.
 
 To enable the repository hooks in a fresh clone, run:
 
@@ -102,4 +109,5 @@ To enable the repository hooks in a fresh clone, run:
 git config core.hooksPath .githooks
 ```
 
-See [AGENTS.md](AGENTS.md) for the working contract used by AI coding agents in this repository.
+See [AGENTS.md](AGENTS.md) for the working contract used by AI coding agents in
+this repository.

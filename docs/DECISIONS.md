@@ -1,52 +1,30 @@
 # Decisions
 
-This document records product and architecture decisions for VoiceLint v0.1.
+This document records settled product and architecture decisions for VoiceLint
+v0.1. Exact behavioral details live in the linked spec documents.
 
 ## Distribution
 
-VoiceLint should be distributed as a public npm package.
-
-Public npm packages are free to publish and install on the public npm registry. Private npm packages require a paid npm account. VoiceLint should start public and open-source, with GitHub as the source repository and npm as the primary package distribution channel.
+VoiceLint should ship as a public npm package.
 
 The `voicelint` package name was checked with npm on June 11, 2026. `npm view
 voicelint` returned `E404`, so the unscoped name appeared available before the
 first publish.
 
-Chosen package name:
+Preferred package name:
 
 1. `voicelint`
 
-Fallback package names if the first publish fails:
+Fallback package names:
 
 - `@danielmulec/voicelint`
 - `@voicelint/cli`
 
-The unscoped `voicelint` name is preferred if available because it is short and matches CLI usage. A scoped package is acceptable if the unscoped name is unavailable or if a namespace becomes useful later.
-
-The initial npm publication may use version `0.0.0` with the `next` dist-tag to
-publish an early development release without presenting it as stable.
-
-Primary commands:
-
-```bash
-npx voicelint init
-npm install -D voicelint
-npx voicelint changed
-```
-
-For real projects, the recommended setup is a local dev dependency:
-
-```bash
-npm install -D voicelint
-```
-
-This lets `npx voicelint` resolve the project-pinned version instead of fetching a temporary remote package.
+The initial publication may use version `0.0.0` with the `next` dist-tag.
 
 ## License
 
 VoiceLint should use the MIT license.
-
-MIT is a low-friction default for open-source developer tools. It is widely understood, allows commercial and non-commercial use, and keeps adoption simple.
 
 ## Core Product Boundary
 
@@ -66,165 +44,154 @@ VoiceLint core is not:
 - a writing assistant
 - a rewrite engine
 
-Agent integrations should wrap the CLI. They should not define the product behavior.
+Agent integrations should wrap the CLI. They should not define product
+behavior.
+
+## v0.1 Scope Lock
+
+VoiceLint v0.1 is deterministic mechanical linting only.
+
+That means:
+
+- no semantic judging
+- no provider-backed execution
+- no agent-session semantic checks
+- no file rewriting
+- no hidden global profiles
+
+Diagnostics may include suggestions, but linting never edits files.
+
+Supported file types for v0.1:
+
+- `.md`
+- `.mdx`
+- `.txt`
+
+See [CLI spec](CLI_SPEC.md), [Config and rules](CONFIG_AND_RULES.md), and
+[Diagnostic model](DIAGNOSTIC_MODEL.md) for the exact behavior.
 
 ## Repo-Local Configuration
 
-VoiceLint should default to repo-local configuration.
+Repo-local configuration is the default.
 
-Repo-local config is reproducible: everyone who works in the repo sees the same lint rules. Machine-local config should be limited to operational concerns such as API keys, provider selection, cache location, and display preferences.
+Machine-local state is reserved for operational concerns such as future provider
+credentials and future cache location. Repo config must remain shareable and
+deterministic.
 
-Example:
+The v0.1 config file is:
 
 ```text
 voicelint.config.yml
-voicelint/
-  rules/
-    no-em-dash.yml
-    no-generic-ai-copy.yml
-    terminology.yml
-  examples/
-    good/
-    bad/
 ```
 
-## Profile Model
+The default rule directory is:
 
-VoiceLint v0.1 supports exactly one active profile per repo.
-
-This keeps the first product version simple and prevents surprising profile resolution. Future versions may add multiple profiles or file-based overrides if the need is proven by real use.
-
-Example v0.1 config:
-
-```yaml
-profile: product
-
-rules:
-  style.no-em-dash: error
-  voice.no-generic-ai-copy: warning
-  voice.no-fake-empathy: warning
+```text
+voicelint/rules/
 ```
 
-Deferred model:
+One active profile per repo is supported in v0.1.
 
-```yaml
-overrides:
-  - files: "site/**/*.mdx"
-    profile: marketing
-```
-
-## Rule Types
+## Mechanical Rule Model
 
 VoiceLint v0.1 implements mechanical rules only.
 
-Mechanical rules are deterministic checks that do not need an LLM. They should
-cover anything that can be identified without understanding the full semantic
-meaning of the text, including punctuation, terminology, capitalization, banned
-phrases, required terms, and simple pattern matches.
+Supported v0.1 rule forms:
 
-Semantic rules are deferred until after v0.1. They cover meaning, context, and
-voice antipatterns that cannot be judged safely through deterministic matching.
+- `match`
+- `terms`
+- `substitution`
 
-Voice fit scores are deferred. They may become part of a future `report` or `audit` mode, but they are not lint rules in v0.1.
+All baseline rules must remain purely mechanical. Semantic-looking rules are
+deferred unless they are represented only as literal phrase substitutions.
 
-The implementation should build the mechanical engine first. Semantic linting is
-deferred until mechanical rules, diagnostics, config loading, discovery,
-formatting, and hook-friendly CLI behavior are working.
+The baseline rules created by `voicelint init` are:
 
-Initial mechanical rule kinds:
+- `style.no-em-dash`
+- `style.no-en-dash`
+- `copy.avoid-generic-product-words`
+- `product.preferred-terms`
 
-- `pattern`: flag literal strings or regular expressions.
-- `terms`: enforce preferred terminology and capitalization.
-- `substitution`: flag discouraged wording and attach replacement suggestions.
+The following are explicitly deferred from the baseline:
 
-Occurrence-count rules are deferred unless a concrete v0.1 use case proves they
-are needed.
+- `voice.no-fake-empathy`
+- `voice.no-vague-transformation-promise`
 
-## Rewriting
+## Exit Codes
 
-VoiceLint v0.1 does not rewrite files.
+VoiceLint v0.1 exit codes are fixed:
 
-Diagnostics may include suggestions, but linting never changes text. This is intentional. Semantic rewrites can alter meaning, product claims, tone, and legal implications.
+- `0`: no blocking diagnostics
+- `1`: one or more mechanical `error` diagnostics found
+- `2`: usage failure, config failure, or internal failure
 
-Potential future autofix support is limited to mechanically safe rules, such as punctuation or whitespace. Semantic rewrite remains out of scope unless explicitly reconsidered.
+Warnings never change the exit code from `0` to `1`.
 
-## Future Semantic Errors
+## Input Modes
 
-Semantic linting is not part of v0.1. When semantic rules are added later, users
-may configure semantic rules as errors, but blocking behavior should be an
-explicit choice.
+The supported v0.1 input modes are:
 
-Recommended behavior:
+- explicit file and directory paths
+- `changed`
+- `staged`
+- stdin
 
-```yaml
-allowSemanticErrors: false
+`changed` and `staged` are part of the core CLI, not agent-specific wrappers.
+
+## Output Formats
+
+VoiceLint v0.1 supports exactly these output formats:
+
+- `pretty`
+- `json`
+- `agent`
+
+SARIF is deferred until after the deterministic CLI is working.
+
+## Init And Codex Hook Setup
+
+`voicelint init` should create a useful default repo-local setup.
+
+`voicelint init --agent codex` should manage the project-local Codex hook file:
+
+```text
+.codex/hooks.json
 ```
 
-When `allowSemanticErrors` is false, semantic `error` severities are downgraded to `warning`. This prevents unstable LLM judgment from blocking agent workflows or CI by accident.
+When an existing hook file must be changed, VoiceLint writes a backup using this
+timestamped naming pattern:
 
-## Baseline Rules
-
-`voicelint init` should create a useful default setup without requiring a template flag.
-
-Baseline rules are examples and starting points. They should teach users how rules work, not claim to be a universal brand voice.
-
-Future optional templates may add narrower rule sets:
-
-```bash
-npx voicelint init --template docs
-npx voicelint init --template ai-copy-antipatterns
+```text
+<filename>.bak.<YYYYMMDDHHMMSS>
 ```
 
-## Future Semantic Execution
+Hook setup must preserve unrelated existing settings, add VoiceLint only when it
+is missing, and abort with a clear manual instruction if the file cannot be
+parsed safely.
+
+Global user configuration must never be edited.
+
+## Future Semantic Direction
 
 Mechanical linting must work without an LLM provider.
 
-Semantic linting needs a judge, but all semantic execution work is deferred until
-the mechanical engine works.
+Semantic linting remains deferred until after the mechanical CLI is complete.
+The preferred research direction is agent-session semantic linting, with
+provider-backed semantic linting as a possible path for CI and non-agent
+workflows.
 
-The preferred research direction is agent-session semantic linting: VoiceLint
-would use the active Codex, Claude Code, Antigravity, or similar chat/session as
-part of the lint workflow instead of requiring a separate external LLM API call
-for common agent-first usage.
-
-Provider-backed semantic linting remains a possible execution path for CI,
-non-agent workflows, and reproducible automation. Provider credentials must not
-live in repo config.
-
-If a provider-backed implementation is added, OpenAI is a likely first provider.
-
-Machine-local examples:
-
-```bash
-OPENAI_API_KEY=...
-```
-
-Future work may add Anthropic, local/Ollama, Gemini, Chinese API providers, and
-agent-session semantic checks.
+Provider credentials must not live in repo config.
 
 ## Future Semantic Cache
 
-Semantic linting should eventually use a local cache.
+If semantic caching is added later, it should use a local user cache instead of
+a repo-local cache unless a later decision changes that default.
 
-The cache avoids repeated LLM calls for unchanged text and unchanged rules. It improves speed, reduces cost, and makes hook usage more practical.
+## References
 
-Possible cache location:
-
-```text
-~/Library/Caches/voicelint
-```
-
-Repo cache is deferred because it creates extra files, merge questions, and possible privacy concerns.
-
-Future CLI cache controls:
-
-```bash
-voicelint changed --no-cache
-voicelint cache clear
-```
-
-## SARIF
-
-SARIF is deferred.
-
-SARIF can later let GitHub and other code scanning UIs display VoiceLint diagnostics like static-analysis findings. It is useful for CI and repository dashboards, but it does not help the first local-agent workflow enough to belong in v0.1.
+- [Implementation plan](IMPLEMENTATION_PLAN.md)
+- [CLI spec](CLI_SPEC.md)
+- [Config and rules](CONFIG_AND_RULES.md)
+- [Diagnostic model](DIAGNOSTIC_MODEL.md)
+- [Test strategy](TEST_STRATEGY.md)
+- [Release checklist](RELEASE_CHECKLIST.md)
