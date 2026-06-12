@@ -4,6 +4,11 @@ set -eu
 message_file="$1"
 message_source="${2:-}"
 repo_root="$(git rev-parse --show-toplevel)"
+implemented_with_value="$("$repo_root/.githooks/read-implemented-with" || true)"
+
+if [ -z "$implemented_with_value" ]; then
+  implemented_with_value='<LLM-Version-Reasoning>'
+fi
 
 case "$message_source" in
   merge | squash | commit)
@@ -53,7 +58,7 @@ fi
   printf 'Files:\n'
   cat "$files_block_file"
   printf '\n'
-  printf 'Implemented with <LLM-Version-Reasoning>\n'
+  printf 'Implemented with %s\n' "$implemented_with_value"
 } > "$template_file"
 
 mv "$template_file" "$message_file"

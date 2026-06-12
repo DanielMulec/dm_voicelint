@@ -1,0 +1,120 @@
+#!/bin/sh
+set -eu
+
+read_session_file() {
+  [ -n "${CODEX_THREAD_ID:-}" ] || return 1
+
+  session_root="${HOME}/.codex/sessions"
+  [ -d "$session_root" ] || return 1
+
+  find "$session_root" -type f -name "*${CODEX_THREAD_ID}.jsonl" 2>/dev/null | \
+    LC_ALL=C sort | \
+    sed -n '1p'
+}
+
+read_codemodel_label() {
+  session_file="$1"
+
+  command -v node >/dev/null 2>&1 || return 1
+
+  node - "$session_file" <<'NODE'
+const { readFileSync } = require("node:fs");
+
+const sessionFile = process.argv[2];
+
+const effortLabels = new Map([
+  ["xhigh", "Extra High"],
+  ["high", "High"],
+  ["medium", "Medium"],
+  ["low", "Low"],
+  ["minimal", "Minimal"],
+]);
+
+const formatModelLabel = (value) =>
+  value
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((part) => {
+      const lowerPart = part.toLowerCase();
+
+      if (lowerPart === "gpt") {
+        return "GPT";
+      }
+
+      if (/^\d+(\.\d+)*$/.test(part)) {
+        return part;
+      }
+
+      return `${lowerPart.charAt(0).toUpperCase()}${lowerPart.slice(1)}`;
+    })
+    .join("-");
+
+const formatEffortLabel = (value) => {
+  const lowerValue = value.toLowerCase();
+  const knownLabel = effortLabels.get(lowerValue);
+
+  if (knownLabel !== undefined) {
+    return knownLabel;
+  }
+
+  return value
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((part) => {
+      const lowerPart = part.toLowerCase();
+      return `${lowerPart.charAt(0).toUpperCase()}${lowerPart.slice(1)}`;
+    })
+    .join(" ");
+};
+
+const lines = readFileSync(sessionFile, "utf8").split(/\r?\n/);
+
+for (const line of lines) {
+  if (line.length === 0) {
+    continue;
+  }
+
+  const entry = JSON.parse(line);
+  if (entry.type !== "turn_context") {
+    continue;
+  }
+
+  const payload = entry.payload ?? {};
+  const model = typeof payload.model === "string" && payload.model.length > 0 ? payload.model : null;
+  const effortCandidates = [
+    payload.effort,
+    payload.collaboration_mode?.settings?.reasoning_effort,
+  ];
+  const effort = effortCandidates.find(
+    (value) => typeof value === "string" && value.length > 0,
+  );
+
+  if (model === null) {
+    break;
+  }
+
+  const modelLabel = formatModelLabel(model);
+  const label = typeof effort === "string"
+    ? `${modelLabel}-${formatEffortLabel(effort)}`
+    : modelLabel;
+
+  process.stdout.write(`${label}\n`);
+  process.exit(0);
+}
+
+process.exit(1);
+NODE
+}
+
+if [ -z "${CODEX_THREAD_ID:-}" ]; then
+  exit 0
+fi
+
+session_file="$(read_session_file || true)"
+
+if [ -z "$session_file" ]; then
+  printf '%s\n' 'Codex'
+  exit 0
+fi
+
+read_codemodel_label "$session_file" || printf '%s\n' 'Codex'

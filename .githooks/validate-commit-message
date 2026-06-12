@@ -4,6 +4,8 @@ set -eu
 message_file="$1"
 expected_files_file="$2"
 context_label="${3:-commit message}"
+repo_root="$(git rev-parse --show-toplevel)"
+expected_implemented_with="$("$repo_root/.githooks/read-implemented-with" || true)"
 
 clean_message_file="$(mktemp)"
 actual_files_file="$(mktemp)"
@@ -101,6 +103,9 @@ do
       implemented_with_value="${line#Implemented with }"
       [ -n "$implemented_with_value" ] || fail "Implemented with requires a non-empty value"
       is_placeholder_line "$implemented_with_value" && fail "replace the Implemented with placeholder before committing"
+      if [ -n "$expected_implemented_with" ] && [ "$implemented_with_value" != "$expected_implemented_with" ]; then
+        fail "Implemented with must be \"$expected_implemented_with\" for this Codex session"
+      fi
       [ "$files_count" -gt 0 ] || fail "Implemented with requires at least one Files bullet first"
       [ "$state" = "after_files_blank" ] || fail "Implemented with must be separated from Files by a blank line"
       [ "$implemented_with_seen" -eq 0 ] || fail "Implemented with may only appear once"

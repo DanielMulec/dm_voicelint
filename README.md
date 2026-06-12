@@ -124,7 +124,8 @@ Mandatory engineering standards:
 Commit history is part of the project documentation. Commits on `main` must use
 a concise subject plus `What:`, `Why:`, `How:`, `Files:`, and an
 `Implemented with ...` line so GitHub history explains intent and
-implementation without external chat logs.
+implementation without external chat logs. In Codex sessions, the hook resolves
+that final line from the active session metadata when it can.
 
 To enable the repository hooks in a fresh clone, run:
 
