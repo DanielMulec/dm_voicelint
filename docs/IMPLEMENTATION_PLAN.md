@@ -21,7 +21,7 @@ text without rewriting files.
 | 9. CLI formatting and ignores | complete | Formatter polish plus inline ignore directives |
 | 10. End-to-end fixtures and dogfooding | complete | Built-package CLI tests plus fixture-based dogfooding |
 | 11. Codex hook setup | pending | `.codex/hooks.json` merge path for `init --agent codex` |
-| 12. Release readiness | pending | CI checks, package verification, release checklist completion |
+| 12. Release readiness | pending | Package verification, release checklist completion, initial publish readiness |
 
 ## Completed So Far
 
@@ -84,6 +84,19 @@ Phase 8 outputs now in repo:
 - config severity overrides applied over rule file severities
 - blocking exit-code behavior for `error` diagnostics with stable JSON output
 
+Phase 9 outputs now in repo:
+
+- dedicated lint diagnostic orchestration that composes source segmentation,
+  mechanical evaluation, ignore handling, deduplication, and final sorting
+- output formatters for `pretty`, `json`, and `agent` that format already
+  ordered diagnostics without owning diagnostic ordering
+- Markdown and MDX inline ignore parsing and application for disable,
+  enable, disable-next-line, and `all`
+- config schema validation split from config file loading
+- file-type source segmentation split from mechanical rule evaluation
+- comments added for non-obvious invariants around Git discovery, source
+  ranges, zero-width regex matches, Unicode columns, and inline code spans
+
 Phase 10 outputs now in repo:
 
 - end-to-end tests for the built `bin/voicelint.mjs` entrypoint
@@ -98,6 +111,8 @@ Required outputs for phase 11:
 
 - merge VoiceLint into `.codex/hooks.json` without overwriting unrelated hooks
 - back up existing hook files before editing them
+- add focused tests for create, merge, backup, idempotence, and invalid existing
+  hook files
 
 ## Work Breakdown
 
@@ -106,12 +121,13 @@ Required outputs for phase 11:
 - keep the command surface limited to paths, `changed`, `staged`, `init`, and
   stdin
 - keep git-backed discovery separate from CLI parsing and command routing
-- preserve the current typed parser shell while adding real input discovery
+- preserve the current typed parser, input discovery, and source reading
+  boundaries while adding Codex hook setup
 
 ### Config and Rules
 
-- validate `voicelint.config.yml`
-- load YAML rule files from `voicelint/rules/`
+- keep config file loading separate from schema validation
+- keep YAML rule loading from `voicelint/rules/` separate from rule evaluation
 - support only mechanical rule forms in v0.1
 
 ### Diagnostics and Formatting
@@ -119,12 +135,16 @@ Required outputs for phase 11:
 - emit stable source locations
 - keep warnings non-blocking
 - make JSON deterministic for agent and CI consumption
+- keep diagnostic ordering and deduplication in the diagnostics boundary, not
+  in individual formatters
 
 ### Safety
 
 - never rewrite user text
 - keep `init --agent codex` project-local
 - back up edited hook files before writing them
+- current `init --agent codex` behavior is intentionally manual until the hook
+  merge path is implemented
 
 ## Definition Of Done For v0.1
 

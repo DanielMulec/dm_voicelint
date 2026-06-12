@@ -11,14 +11,19 @@ Completed phases:
 - phase 4: input discovery
 - phase 5: config loading and baseline init
 - phase 6: segmentation and source locations
+- phase 7: mechanical rule loading
+- phase 8: rule evaluation and diagnostics
+- phase 9: CLI formatting and inline ignores
+- phase 10: built-package end-to-end fixtures and dogfooding
 
-The repository now has a compiled TypeScript CLI shell, CI, and tests. Real
-lint execution has not started yet, but the CLI can now discover the text
-sources it will later lint through a real repo-local config and stable segment
-locations.
+The repository now has a compiled TypeScript CLI, CI, tests, repo-local config
+loading, source discovery, Markdown/plain-text segmentation, mechanical rule
+loading, deterministic diagnostics, pretty/JSON/agent output, and Markdown/MDX
+inline ignore handling.
 
-Input discovery landed before config loading in implementation history, but
-both are now complete in `main`.
+Codex hook setup through `init --agent codex` remains the next implementation
+milestone. The current command creates or verifies the baseline config and rule
+files, then returns a manual hook-setup follow-up until hook merging lands.
 
 ## v0.1 Delivery Order
 
@@ -31,13 +36,11 @@ both are now complete in `main`.
 4. Completed: file discovery for paths, `changed`, `staged`, and stdin content,
    plus staged reads from the Git index.
 5. Completed: Markdown/plain-text segmentation with stable source locations.
-6. Next: mechanical rule loading.
-7. Next: rule evaluation and diagnostic assembly.
-8. Next: `pretty` / `json` / `agent` formatting plus ignore handling for
-   default ignores and Markdown/MDX inline
-   directives.
-9. Next: optional Codex hook setup through
-   `.codex/hooks.json`.
+6. Completed: mechanical rule loading.
+7. Completed: rule evaluation and diagnostic assembly.
+8. Completed: `pretty` / `json` / `agent` formatting plus default ignores and
+   Markdown/MDX inline ignore directives.
+9. Next: optional Codex hook setup through `.codex/hooks.json`.
 10. Last: release verification, packaging, and initial npm publish.
 
 The detailed tracker lives in [Implementation plan](IMPLEMENTATION_PLAN.md).

@@ -46,8 +46,16 @@ Current implemented tests:
 - literal, regex, terms, and substitution rule evaluation
 - severity override resolution
 - duplicate-diagnostic prevention
+- lint diagnostic orchestration for segmentation, ignore application,
+  deduplication, and ordering
+- pretty, JSON, and agent formatter rendering
+- JSON-formatted lint errors before linting starts
+- Markdown/MDX ignore comment behavior, including `all`, malformed comments,
+  unmatched enables, and wrong-file/range/rule non-suppression
 - empty-file segmentation behavior
 - file-line guard behavior
+- built-package CLI execution for help, init, lint, stdin, `changed`, and
+  `staged`
 
 ## v0.1 Test Layers
 
@@ -102,7 +110,7 @@ Required CLI integration coverage:
 - exit codes `0`, `1`, and `2`
 - `pretty`, `json`, and `agent` output modes
 - `init`
-- `init --agent codex`
+- `init --agent codex` once hook merging is implemented
 
 ### 5. Governance Checks
 
@@ -117,11 +125,12 @@ Required non-behavioral checks:
 The v0.1 CI pipeline is done only when it runs and enforces all of these:
 
 1. install dependencies on a supported Node 20+ runtime
-2. `npm run smoke`
+2. `npm run typecheck`
 3. `npm run lint`
-4. `npm run typecheck`
-5. `npm test`
-6. `npm run check:lines`
+4. `npm test`
+5. `npm run check:lines`
+6. `npm run build`
+7. `npm run smoke`
 
 No live provider calls are allowed in normal CI for v0.1.
 

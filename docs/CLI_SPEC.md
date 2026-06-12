@@ -5,7 +5,9 @@
 VoiceLint v0.1 supports this command surface:
 
 ```text
-voicelint [path ...] [--config PATH] [--format pretty|json|agent] [--stdin-file-path PATH]
+voicelint [path ...] [--config PATH] [--format pretty|json|agent]
+voicelint [--stdin-file-path PATH] [--config PATH] [--format pretty|json|agent]
+voicelint --stdin [--stdin-file-path PATH] [--config PATH] [--format pretty|json|agent]
 voicelint changed [--config PATH] [--format pretty|json|agent]
 voicelint staged [--config PATH] [--format pretty|json|agent]
 voicelint init [--agent codex]
@@ -27,7 +29,8 @@ Rules:
 | --- | --- | --- |
 | `--config PATH` | Repo-local config path | Defaults to `voicelint.config.yml` in the current working directory |
 | `--format FORMAT` | Output formatter | Allowed values: `pretty`, `json`, `agent`; default is `pretty` |
-| `--stdin-file-path PATH` | Virtual path for stdin | Valid only in stdin mode; used for file-type detection and diagnostics |
+| `--stdin` | Explicit stdin mode | Cannot be combined with path arguments |
+| `--stdin-file-path PATH` | Virtual path for stdin | Valid only when input comes from stdin; used for file-type detection and diagnostics |
 | `--help` | Print usage | Exits `0` |
 | `--version` | Print package version | Exits `0` |
 
@@ -57,15 +60,16 @@ Stdin mode is active only when:
 
 - no path arguments are provided
 - the command is not `changed`, `staged`, or `init`
-- stdin is piped
+- stdin is piped or explicit `--stdin` is present
 
 Behavior:
 
 - if `--stdin-file-path` is present, VoiceLint uses that path for file-type
   detection and diagnostic file names
 - if `--stdin-file-path` is absent, VoiceLint uses `<stdin>`
-- path arguments and piped stdin may not be mixed; that is a usage failure with
-  exit code `2`
+- path arguments may not be combined with explicit `--stdin`; that is a usage
+  failure with exit code `2`
+- `--stdin-file-path` without stdin mode is a usage failure
 - `changed` and `staged` never read stdin
 
 ## `changed`
@@ -137,11 +141,14 @@ Safety rules:
 - current implementation creates or verifies the baseline files first; Codex
   hook setup still returns a manual follow-up instruction until hook support
   lands
-- existing `.codex/hooks.json` is parsed and merged, never overwritten
-- a modified hook file is backed up as `<filename>.bak.<YYYYMMDDHHMMSS>`
-- if an existing hook file cannot be parsed safely, VoiceLint exits `2` with a
-  manual follow-up instruction
 - no global user configuration is edited
+
+Planned Codex hook setup rules:
+
+- existing `.codex/hooks.json` will be parsed and merged, never overwritten
+- a modified hook file will be backed up as `<filename>.bak.<YYYYMMDDHHMMSS>`
+- if an existing hook file cannot be parsed safely, VoiceLint will exit `2`
+  with a manual follow-up instruction
 
 ## Exit Codes
 

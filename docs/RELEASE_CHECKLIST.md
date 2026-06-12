@@ -19,12 +19,13 @@ This checklist applies to the first deterministic mechanical CLI release.
 
 Run all required release checks:
 
-1. `npm run smoke`
+1. `npm run typecheck`
 2. `npm run lint`
-3. `npm run typecheck`
-4. `npm test`
-5. `npm run check:lines`
-6. `npm pack`
+3. `npm test`
+4. `npm run check:lines`
+5. `npm run build`
+6. `npm run smoke`
+7. `npm pack`
 
 Then validate the package artifact in a temp directory:
 

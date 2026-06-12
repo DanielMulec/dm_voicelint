@@ -43,13 +43,15 @@ npx voicelint init
 npx voicelint .
 npx voicelint changed
 npx voicelint staged
+npx voicelint --stdin
 ```
 
 Agent integrations, Git hooks, editor integrations, and future dashboards should all call the same CLI.
 
-The first implementation should prove the deterministic CLI path before adding
-semantic linting, agent hook setup, provider-backed judging, or semantic rule
-test commands.
+The current implementation proves the deterministic CLI path. Remaining v0.1
+work should finish project-local Codex hook setup and release verification
+before adding semantic linting, provider-backed judging, or semantic rule test
+commands.
 
 ## Documentation Map
 

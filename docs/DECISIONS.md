@@ -191,6 +191,29 @@ Behavior:
 - malformed ignore comments never suppress diagnostics
 - unmatched `enable` comments never suppress diagnostics
 
+## Implementation Boundaries
+
+The implemented v0.1 lint path keeps these responsibilities in separate
+modules:
+
+- CLI parsing and command routing
+- config file loading
+- config schema validation
+- source discovery and Git index reads
+- Markdown/plain-text source segmentation
+- mechanical rule loading
+- mechanical rule evaluation over prepared segments
+- lint diagnostic orchestration, including ignore application, deduplication,
+  and final ordering
+- output formatting
+
+Formatters do not sort diagnostics. They receive diagnostics that have already
+been ordered by the diagnostics boundary.
+
+Rule evaluation does not decide source file type, parse ignore comments, or
+sort diagnostics. It evaluates loaded mechanical rules against prepared text
+segments.
+
 ## Init And Codex Hook Setup
 
 `voicelint init` should create a useful default repo-local setup.
@@ -213,6 +236,11 @@ is missing, and abort with a clear manual instruction if the file cannot be
 parsed safely.
 
 Global user configuration must never be edited.
+
+Current implementation status: base `voicelint init` creates or verifies the
+repo-local config and baseline rule files. `init --agent codex` is parsed, but
+the Codex hook merge path is pending and currently returns a manual follow-up
+instruction after the baseline files are handled.
 
 ## Future Semantic Direction
 

@@ -21,14 +21,16 @@ VoiceLint should offer optional agent setup commands:
 ```bash
 npx voicelint init
 npx voicelint init --agent codex
-npx voicelint init --agent claude
 ```
 
-`init --agent` may create project-local hook files, but it must not silently edit global user configuration.
+`init --agent codex` may create project-local hook files after the hook merge
+path is implemented, but it must not silently edit global user configuration.
+Claude setup is deferred until after v0.1.
 
-Hook setup should be implemented after the base CLI path is stable: config
-loading, input discovery, segmentation, mechanical diagnostics, and output
-formatting should work first.
+Hook setup is intentionally after the base CLI path. Config loading, input
+discovery, segmentation, mechanical diagnostics, ignore handling, and output
+formatting now work; the remaining implementation work is the safe project-local
+hook merge.
 
 The init output should remind the user that agent projects may need to be trusted before project-local hooks run.
 
@@ -60,11 +62,11 @@ Codex supports project-local configuration and hooks, but project-local config i
 VoiceLint should prefer project-local files such as:
 
 ```text
-.codex/config.toml
 .codex/hooks.json
 ```
 
-The exact file should be chosen when implementation starts and verified against the current Codex hook schema.
+The selected v0.1 hook target is `.codex/hooks.json`. The merge behavior still
+needs to be implemented and verified against the current Codex hook schema.
 
 ## Claude Code
 
