@@ -19,7 +19,7 @@ text without rewriting files.
 | 7. Rule loading | complete | YAML rule loading into typed mechanical rule definitions |
 | 8. Rule evaluation and diagnostics | complete | Mechanical evaluation, source mapping, and blocking semantics |
 | 9. CLI formatting and ignores | complete | Formatter polish plus inline ignore directives |
-| 10. End-to-end fixtures and dogfooding | complete | Built-package CLI tests plus repo-local dogfooding |
+| 10. End-to-end fixtures and dogfooding | complete | Built-package CLI tests plus fixture-based dogfooding |
 | 11. Codex hook setup | pending | `.codex/hooks.json` merge path for `init --agent codex` |
 | 12. Release readiness | pending | CI checks, package verification, release checklist completion |
 
@@ -88,7 +88,6 @@ Phase 10 outputs now in repo:
 
 - end-to-end tests for the built `bin/voicelint.mjs` entrypoint
 - fixture projects for init, lint, ignores, `changed`, `staged`, and stdin
-- repo-local baseline config and rules so VoiceLint can lint this repository
 - JSON and agent output assertions through the packaged CLI path
 
 ## Current Milestone

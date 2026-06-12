@@ -1,9 +1,0 @@
-id: style.no-em-dash
-type: mechanical
-severity: error
-description: Do not use em dashes.
-
-match:
-  pattern: "—"
-
-message: "Use a comma, colon, parentheses, or a sentence break instead of an em dash."
