@@ -1,10 +1,10 @@
 import { extname } from "node:path";
 
+import type { Diagnostic } from "../diagnostics/diagnostic.js";
 import {
-  compareDiagnostics,
   deduplicateDiagnostics,
-  type Diagnostic,
-} from "../diagnostics/create-diagnostic.js";
+  sortDiagnostics,
+} from "../diagnostics/sort-diagnostics.js";
 import { createLineIndex } from "../locations/line-index.js";
 import type { TextSource } from "../input/read-source.js";
 import { createMarkdownSegments } from "../segments/markdown-segments.js";
@@ -22,7 +22,9 @@ export function evaluateRules(
 ): readonly Diagnostic[] {
   return sortDiagnostics(
     deduplicateDiagnostics(
-      sources.flatMap((source) => evaluateSourceRules(source, rules, profile)),
+      sources.flatMap((source) =>
+        evaluateSourceRules(source, rules, profile)
+      ),
     ),
   );
 }
@@ -60,10 +62,6 @@ function readRuleSegments(source: TextSource): readonly TextSegment[] {
   return isMarkdownSource(source.path)
     ? createMarkdownSegments(source.content)
     : createPlainTextSegments(source.content).filter((segment) => segment.kind === "paragraph");
-}
-
-function sortDiagnostics(diagnostics: readonly Diagnostic[]): readonly Diagnostic[] {
-  return [...diagnostics].sort(compareDiagnostics);
 }
 
 function isMarkdownSource(sourcePath: string): boolean {

@@ -5,3 +5,7 @@ export const exitCodes = {
 } as const;
 
 export type ExitCode = (typeof exitCodes)[keyof typeof exitCodes];
+
+export function resolveLintExitCode(errorCount: number): ExitCode {
+  return errorCount > 0 ? exitCodes.blockingDiagnostics : exitCodes.success;
+}

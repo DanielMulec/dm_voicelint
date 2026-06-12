@@ -6,7 +6,7 @@ VoiceLint v0.1 emits deterministic mechanical diagnostics only.
 
 Rules:
 
-- diagnostics are sorted by file path, then line, then column, then rule id
+- diagnostics are sorted by file path, then full source range, then rule id
 - `error` diagnostics are blocking
 - `warning` diagnostics are non-blocking
 - no v0.1 diagnostic includes semantic `confidence`
@@ -103,17 +103,18 @@ That error path still exits with code `2`.
 
 Requirements:
 
-- group diagnostics by file
-- show line and column
+- one diagnostic per line using `file:line:column`
 - include the rule id
+- include the severity
+- include the message
+- include `Suggestion:` on a following line only when present
 - include a summary footer
 - ANSI color is allowed only when stdout is a TTY
 
 Example:
 
 ```text
-README.md
-  18:11  error    style.no-em-dash  Use a comma, colon, parentheses, or a sentence break instead of an em dash.
+README.md:18:11  error    style.no-em-dash  Use a comma, colon, parentheses, or a sentence break instead of an em dash.
 
 1 error, 0 warnings in 1 file
 ```
@@ -128,12 +129,14 @@ Requirements:
 - stable line-based output
 - include the file, location, severity, rule id, and message
 - include `Suggestion:` on a following line only when present
+- include a final `Summary:` line
 
 Example:
 
 ```text
 README.md:18:11 [error] style.no-em-dash Use a comma, colon, parentheses, or a sentence break instead of an em dash.
 Suggestion: Rewrite the sentence without the em dash.
+Summary: 1 error, 0 warnings in 1 file
 ```
 
 ### `json`

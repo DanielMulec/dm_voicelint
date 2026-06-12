@@ -4,11 +4,13 @@ import {
   loadVoiceLintConfig,
   type LoadedVoiceLintConfig,
 } from "../config/load-config.js";
+import { formatAgentDiagnostics } from "../output/agent-format.js";
 import {
-  createDiagnosticSummary,
-  formatDiagnostics,
-  formatLintErrorAsJson,
-} from "../diagnostics/format-diagnostics.js";
+  formatJsonDiagnostics,
+  formatJsonLintError,
+} from "../output/json-format.js";
+import { formatPrettyDiagnostics } from "../output/pretty-format.js";
+import { createDiagnosticSummary } from "../output/summary.js";
 import { discoverInputSources, type DiscoveredInputSources } from "../input/input-mode.js";
 import { evaluateRules } from "../rules/evaluate-rules.js";
 import { loadRules } from "../rules/load-rules.js";
@@ -143,7 +145,7 @@ function createLintSuccessOutput(
 
   return {
     exitCode: summary.exitCode,
-    stdoutText: formatDiagnostics(format, summary, diagnostics),
+    stdoutText: formatLintOutput(format, summary, diagnostics),
   };
 }
 
@@ -154,9 +156,23 @@ function createFailureResult(
   return format === "json"
     ? ok({
         exitCode: error.exitCode,
-        stdoutText: formatLintErrorAsJson(error.message),
+        stdoutText: formatJsonLintError(error.message),
       })
     : err(error);
+}
+
+function formatLintOutput(
+  format: ParsedLintCommand["format"],
+  summary: Parameters<typeof formatPrettyDiagnostics>[0],
+  diagnostics: Parameters<typeof formatPrettyDiagnostics>[1],
+): string {
+  if (format === "json") {
+    return formatJsonDiagnostics(summary, diagnostics);
+  }
+
+  return format === "agent"
+    ? formatAgentDiagnostics(summary, diagnostics)
+    : formatPrettyDiagnostics(summary, diagnostics);
 }
 
 function createOptionalCwd(

@@ -12,10 +12,25 @@ import {
 
 const workspacePaths: string[] = [];
 const lintJsonSchema = z.object({
+  summary: z.object({
+    scannedFileCount: z.number(),
+    diagnosticCount: z.number(),
+    errorCount: z.number(),
+    warningCount: z.number(),
+    exitCode: z.number(),
+  }),
   diagnostics: z.array(
     z.object({
+      file: z.string(),
+      line: z.number(),
+      column: z.number(),
+      endLine: z.number(),
+      endColumn: z.number(),
+      profile: z.string(),
       ruleId: z.string(),
-      severity: z.string(),
+      severity: z.enum(["error", "warning"]),
+      message: z.string(),
+      suggestion: z.string().optional(),
     }),
   ),
 });
@@ -28,6 +43,66 @@ const lintErrorSchema = z.object({
 describe("executeLintCommand", () => {
   afterEach(async () => {
     await Promise.all(workspacePaths.splice(0).map(removeWorkspace));
+  });
+
+  it("returns exit 0 when diagnostics are warnings only", async () => {
+    const workspacePath = await createWorkspace();
+    await writeSingleRuleWorkspace(workspacePath, "warning");
+    await writeWorkspaceFile(workspacePath, "README.md", "alpha — beta\n");
+
+    const commandResult = await executeLintCommand(
+      {
+        commandName: "lint",
+        requestedInputMode: "paths",
+        pathArgs: ["README.md"],
+        format: "json",
+      },
+      createEmptyInput(),
+      { cwd: workspacePath },
+    );
+
+    expect(commandResult).toMatchObject({
+      ok: true,
+      value: { exitCode: 0 },
+    });
+    const jsonOutput = parseLintJsonOutput(commandResult);
+    expect(jsonOutput.summary).toEqual({
+      scannedFileCount: 1,
+      diagnosticCount: 1,
+      errorCount: 0,
+      warningCount: 1,
+      exitCode: 0,
+    });
+  });
+
+  it("returns exit 1 when an error diagnostic is present", async () => {
+    const workspacePath = await createWorkspace();
+    await writeSingleRuleWorkspace(workspacePath, "error");
+    await writeWorkspaceFile(workspacePath, "README.md", "alpha — beta\n");
+
+    const commandResult = await executeLintCommand(
+      {
+        commandName: "lint",
+        requestedInputMode: "paths",
+        pathArgs: ["README.md"],
+        format: "json",
+      },
+      createEmptyInput(),
+      { cwd: workspacePath },
+    );
+
+    expect(commandResult).toMatchObject({
+      ok: true,
+      value: { exitCode: 1 },
+    });
+    const jsonOutput = parseLintJsonOutput(commandResult);
+    expect(jsonOutput.summary).toEqual({
+      scannedFileCount: 1,
+      diagnosticCount: 1,
+      errorCount: 1,
+      warningCount: 0,
+      exitCode: 1,
+    });
   });
 
   it("applies config severity overrides over rule file severity", async () => {
@@ -76,9 +151,7 @@ describe("executeLintCommand", () => {
       ok: true,
       value: { exitCode: 1 },
     });
-    const jsonOutput = lintJsonSchema.parse(
-      JSON.parse(commandResult.ok ? commandResult.value.stdoutText ?? "" : "") as unknown,
-    );
+    const jsonOutput = parseLintJsonOutput(commandResult);
     expect(jsonOutput.diagnostics).toEqual([
       expect.objectContaining({
         ruleId: "style.no-en-dash",
@@ -150,4 +223,45 @@ function createEmptyInput(): PassThrough {
   const input = new PassThrough();
   input.end();
   return input;
+}
+
+function parseLintJsonOutput(
+  commandResult: Awaited<ReturnType<typeof executeLintCommand>>,
+): z.infer<typeof lintJsonSchema> {
+  return lintJsonSchema.parse(
+    JSON.parse(commandResult.ok ? commandResult.value.stdoutText ?? "" : "") as unknown,
+  );
+}
+
+async function writeSingleRuleWorkspace(
+  workspacePath: string,
+  severity: "error" | "warning",
+): Promise<void> {
+  await writeWorkspaceFile(
+    workspacePath,
+    "voicelint.config.yml",
+    [
+      "profile: product",
+      "",
+      "rules:",
+      `  style.no-em-dash: ${severity}`,
+      "",
+    ].join("\n"),
+  );
+  await writeWorkspaceFile(
+    workspacePath,
+    "voicelint/rules/style.no-em-dash.yml",
+    [
+      "id: style.no-em-dash",
+      "type: mechanical",
+      `severity: ${severity}`,
+      "description: Do not use em dashes.",
+      "",
+      "match:",
+      '  pattern: "—"',
+      "",
+      'message: "Do not use em dashes."',
+      "",
+    ].join("\n"),
+  );
 }
