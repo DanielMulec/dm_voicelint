@@ -1,5 +1,4 @@
 import type { Diagnostic } from "../diagnostics/diagnostic.js";
-import { sortDiagnostics } from "../diagnostics/sort-diagnostics.js";
 import type { DiagnosticSummary } from "./summary.js";
 
 interface JsonDiagnosticOutput {
@@ -30,7 +29,7 @@ function createJsonDiagnosticOutput(
 ): JsonDiagnosticOutput {
   return {
     summary,
-    diagnostics: sortDiagnostics(diagnostics),
+    diagnostics,
   };
 }
 

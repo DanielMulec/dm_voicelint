@@ -4,6 +4,7 @@ import {
   loadVoiceLintConfig,
   type LoadedVoiceLintConfig,
 } from "../config/load-config.js";
+import { createLintDiagnostics } from "../diagnostics/lint-diagnostics.js";
 import { formatAgentDiagnostics } from "../output/agent-format.js";
 import {
   formatJsonDiagnostics,
@@ -12,9 +13,9 @@ import {
 import { formatPrettyDiagnostics } from "../output/pretty-format.js";
 import { createDiagnosticSummary } from "../output/summary.js";
 import { discoverInputSources, type DiscoveredInputSources } from "../input/input-mode.js";
-import { evaluateRules } from "../rules/evaluate-rules.js";
 import { loadRules } from "../rules/load-rules.js";
 import { createRuleIndex, resolveConfiguredRules } from "../rules/rule-index.js";
+import type { LoadedMechanicalRule } from "../rules/rule-schema.js";
 import { err, ok, type CommandResult, type Result } from "../shared/result.js";
 
 export interface LintCommandOptions {
@@ -42,7 +43,7 @@ export async function executeLintCommand(
 interface PreparedLintExecution {
   readonly discoveredInputSources: DiscoveredInputSources;
   readonly loadedConfig: LoadedVoiceLintConfig;
-  readonly loadedRules: Parameters<typeof evaluateRules>[1];
+  readonly loadedRules: readonly LoadedMechanicalRule[];
 }
 
 async function prepareLintExecution(
@@ -100,7 +101,7 @@ async function loadConfiguredRules(
 
 function resolveLoadedRules(
   loadedConfig: LoadedVoiceLintConfig,
-  loadedRules: readonly NonNullable<PreparedLintExecution["loadedRules"]>[number][],
+  loadedRules: readonly LoadedMechanicalRule[],
 ): Result<PreparedLintExecution["loadedRules"], AppError> {
   const ruleIndexResult = createRuleIndex(loadedRules);
   return ruleIndexResult.ok
@@ -131,9 +132,9 @@ function createLintSuccessOutput(
   format: ParsedLintCommand["format"],
   discoveredInputSources: DiscoveredInputSources,
   loadedConfig: LoadedVoiceLintConfig,
-  loadedRules: Parameters<typeof evaluateRules>[1],
+  loadedRules: readonly LoadedMechanicalRule[],
 ) {
-  const diagnostics = evaluateRules(
+  const diagnostics = createLintDiagnostics(
     discoveredInputSources.sources,
     loadedRules,
     loadedConfig.profile,

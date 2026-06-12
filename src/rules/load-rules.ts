@@ -11,6 +11,7 @@ import { err, ok, type Result } from "../shared/result.js";
 import {
   mechanicalRuleDefinitionSchema,
   type LoadedMechanicalRule,
+  type LoadedMechanicalRuleBase,
   type MechanicalRuleDefinition,
   type PatternMatcher,
   type ReplacementEntry,
@@ -114,8 +115,9 @@ function parseRuleSource(
   ruleSource: string,
 ): Result<unknown, AppError> {
   const parsedDocument = parseDocument(ruleSource);
+  const ruleValue: unknown = parsedDocument.toJS();
   return parsedDocument.errors.length === 0
-    ? ok(parsedDocument.toJS() as unknown)
+    ? ok(ruleValue)
     : err(createRuleParseError(ruleFilePath, readYamlErrorText(parsedDocument.errors)));
 }
 
@@ -191,10 +193,10 @@ function createPatternMatcher(
 function createRuleBase(
   ruleFilePath: string,
   ruleDefinition: MechanicalRuleDefinition,
-) {
+): LoadedMechanicalRuleBase {
   return {
     id: ruleDefinition.id,
-    type: "mechanical" as const,
+    type: "mechanical",
     severity: ruleDefinition.severity,
     description: ruleDefinition.description,
     message: ruleDefinition.message,

@@ -41,7 +41,8 @@ type InitOptionParser = (
   state: InitState,
 ) => StateParseResult<InitState>;
 
-const supportedFormats = new Set<OutputFormat>(["pretty", "json", "agent"]);
+const supportedFormatValues = ["pretty", "json", "agent"] as const satisfies readonly OutputFormat[];
+const supportedFormats = new Set<string>(supportedFormatValues);
 
 export const defaultStandardLintState: StandardLintState = {
   explicitStdin: false,
@@ -363,7 +364,7 @@ function readOutputFormat(
 }
 
 function isOutputFormat(value: string): value is OutputFormat {
-  return supportedFormats.has(value as OutputFormat);
+  return supportedFormats.has(value);
 }
 
 function isOptionToken(token: string): boolean {

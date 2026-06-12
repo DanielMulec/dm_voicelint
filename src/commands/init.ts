@@ -118,8 +118,9 @@ function readErrorCode(error: unknown): string | undefined {
 }
 
 function isErrorWithCode(error: unknown): error is NodeJS.ErrnoException {
-  const errnoError = error as NodeJS.ErrnoException;
-  return error instanceof Error && typeof errnoError.code === "string";
+  return error instanceof Error
+    && "code" in error
+    && typeof error.code === "string";
 }
 
 function readInitReadFailureMessage(relativePath: string, error: unknown): string {

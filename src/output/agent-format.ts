@@ -1,5 +1,4 @@
 import type { Diagnostic } from "../diagnostics/diagnostic.js";
-import { sortDiagnostics } from "../diagnostics/sort-diagnostics.js";
 import {
   formatSummaryLine,
   type DiagnosticSummary,
@@ -9,9 +8,8 @@ export function formatAgentDiagnostics(
   summary: DiagnosticSummary,
   diagnostics: readonly Diagnostic[],
 ): string {
-  const sortedDiagnostics = sortDiagnostics(diagnostics);
   return `${[
-    ...sortedDiagnostics.flatMap(formatAgentDiagnostic),
+    ...diagnostics.flatMap(formatAgentDiagnostic),
     `Summary: ${formatSummaryLine(summary)}`,
   ].join("\n")}\n`;
 }

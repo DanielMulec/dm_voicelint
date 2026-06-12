@@ -3,29 +3,27 @@ import { resolve } from "node:path";
 import { cwd as readCurrentWorkingDirectory } from "node:process";
 
 import { parseDocument } from "yaml";
-import type { ZodIssue } from "zod";
 
 import type { AppError } from "../shared/errors.js";
 import { err, ok, type Result } from "../shared/result.js";
 import {
   createConfigParseError,
   createConfigReadError,
-  createConfigValidationError,
   createMissingConfigError,
 } from "./config-errors.js";
 import {
   defaultConfigFilePath,
-  voiceLintConfigSchema,
-  type VoiceLintConfig,
 } from "./config-schema.js";
+import {
+  validateVoiceLintConfig,
+  type ValidatedVoiceLintConfig,
+} from "./validate-config.js";
 
 export interface LoadConfigOptions {
   readonly cwd?: string;
 }
 
-export interface LoadedVoiceLintConfig extends VoiceLintConfig {
-  readonly configFilePath: string;
-}
+export type LoadedVoiceLintConfig = ValidatedVoiceLintConfig;
 
 export async function loadVoiceLintConfig(
   configPath: string | undefined,
@@ -52,7 +50,7 @@ function parseLoadedConfig(
 ): Result<LoadedVoiceLintConfig, AppError> {
   const configValueResult = parseConfigSource(configFilePath, configSource);
   return configValueResult.ok
-    ? validateConfigValue(configFilePath, configValueResult.value)
+    ? validateVoiceLintConfig(configFilePath, configValueResult.value)
     : configValueResult;
 }
 
@@ -84,8 +82,9 @@ function readErrorCode(error: unknown): string | undefined {
 }
 
 function isErrorWithCode(error: unknown): error is NodeJS.ErrnoException {
-  const errnoError = error as NodeJS.ErrnoException;
-  return error instanceof Error && typeof errnoError.code === "string";
+  return error instanceof Error
+    && "code" in error
+    && typeof error.code === "string";
 }
 
 function readErrorDetails(error: unknown): string {
@@ -97,8 +96,9 @@ function parseConfigSource(
   configSource: string,
 ): Result<unknown, AppError> {
   const parsedDocument = parseDocument(configSource);
+  const configValue: unknown = parsedDocument.toJS();
   return parsedDocument.errors.length === 0
-    ? ok(parsedDocument.toJS() as unknown)
+    ? ok(configValue)
     : err(createConfigParseError(configFilePath, readYamlErrorText(parsedDocument.errors)));
 }
 
@@ -106,33 +106,6 @@ function readYamlErrorText(
   errors: readonly Error[],
 ): string {
   return errors.map((error) => error.message).join(" ");
-}
-
-function validateConfigValue(
-  configFilePath: string,
-  configValue: unknown,
-): Result<LoadedVoiceLintConfig, AppError> {
-  const parsedConfig = voiceLintConfigSchema.safeParse(configValue);
-  return parsedConfig.success
-    ? ok({
-        ...parsedConfig.data,
-        configFilePath,
-      })
-    : err(
-        createConfigValidationError(
-          configFilePath,
-          parsedConfig.error.issues.map(formatConfigIssue),
-        ),
-      );
-}
-
-function formatConfigIssue(issue: ZodIssue): string {
-  const issuePath = readIssuePath(issue.path);
-  return issuePath.length === 0 ? issue.message : `${issuePath}: ${issue.message}`;
-}
-
-function readIssuePath(path: readonly PropertyKey[]): string {
-  return path.map((segment) => String(segment)).join(".");
 }
 
 function resolveConfigFilePath(cwd: string, configPath: string | undefined): string {

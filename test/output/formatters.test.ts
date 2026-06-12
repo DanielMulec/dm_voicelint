@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import type { Diagnostic } from "../../src/diagnostics/diagnostic.js";
+import { sortDiagnostics } from "../../src/diagnostics/sort-diagnostics.js";
 import { formatAgentDiagnostics } from "../../src/output/agent-format.js";
 import { formatJsonDiagnostics } from "../../src/output/json-format.js";
 import { formatPrettyDiagnostics } from "../../src/output/pretty-format.js";
@@ -33,7 +34,7 @@ const jsonOutputSchema = z.object({
 
 describe("diagnostic formatters", () => {
   it("formats pretty output for humans", () => {
-    const diagnostics = createDiagnostics();
+    const diagnostics = sortDiagnostics(createDiagnostics());
     const summary = createDiagnosticSummary(2, diagnostics);
 
     expect(formatPrettyDiagnostics(summary, diagnostics)).toBe(
@@ -48,14 +49,11 @@ describe("diagnostic formatters", () => {
     );
   });
 
-  it("formats valid stable json output", () => {
-    const diagnostics = createDiagnostics();
+  it("formats valid json output", () => {
+    const diagnostics = sortDiagnostics(createDiagnostics());
     const summary = createDiagnosticSummary(2, diagnostics);
     const output = formatJsonDiagnostics(summary, diagnostics);
 
-    expect(output).toBe(
-      formatJsonDiagnostics(summary, [...diagnostics].reverse()),
-    );
     expect(jsonOutputSchema.parse(JSON.parse(output) as unknown)).toEqual({
       summary: {
         scannedFileCount: 2,
@@ -93,7 +91,7 @@ describe("diagnostic formatters", () => {
   });
 
   it("formats concise agent output", () => {
-    const diagnostics = createDiagnostics();
+    const diagnostics = sortDiagnostics(createDiagnostics());
     const summary = createDiagnosticSummary(2, diagnostics);
 
     expect(formatAgentDiagnostics(summary, diagnostics)).toBe(

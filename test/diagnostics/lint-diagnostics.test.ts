@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluateRules } from "../../src/rules/evaluate-rules.js";
+import { createLintDiagnostics } from "../../src/diagnostics/lint-diagnostics.js";
 import type {
   LoadedPatternRule,
   LoadedSubstitutionRule,
@@ -8,9 +8,9 @@ import type {
 } from "../../src/rules/rule-schema.js";
 import type { TextSource } from "../../src/input/read-source.js";
 
-describe("evaluateRules", () => {
+describe("createLintDiagnostics", () => {
   it("finds literal pattern matches", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [createSource("README.md", "Before — after\n")],
       [createLiteralPatternRule("style.no-em-dash", "—")],
       "product",
@@ -30,7 +30,7 @@ describe("evaluateRules", () => {
   });
 
   it("finds regex pattern matches", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [createSource("README.md", "agent\nagent\n")],
       [createRegexPatternRule("product.agent-word", "\\bagent\\b")],
       "product",
@@ -41,7 +41,7 @@ describe("evaluateRules", () => {
   });
 
   it("creates preferred-term suggestions with case-sensitive matching", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [createSource("README.md", "AI assistant and ai assistant\n")],
       [createTermsRule()],
       "product",
@@ -55,7 +55,7 @@ describe("evaluateRules", () => {
   });
 
   it("creates substitution suggestions", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [createSource("README.md", "A seamless workflow.\n")],
       [createSubstitutionRule()],
       "product",
@@ -69,7 +69,7 @@ describe("evaluateRules", () => {
   });
 
   it("reports multiple diagnostics in one file in deterministic order", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [createSource("README.md", "— then –\n")],
       [
         createLiteralPatternRule("style.no-en-dash", "–"),
@@ -85,7 +85,7 @@ describe("evaluateRules", () => {
   });
 
   it("does not duplicate diagnostics for plain-text line and paragraph segments", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [createSource("notes.txt", "seamless workflow\n")],
       [createSubstitutionRule()],
       "product",
@@ -95,7 +95,7 @@ describe("evaluateRules", () => {
   });
 
   it("supports disable-next-line for a specific rule", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [
         createSource(
           "README.md",
@@ -119,7 +119,7 @@ describe("evaluateRules", () => {
   });
 
   it("supports disable-next-line for all rules", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [
         createSource(
           "README.md",
@@ -146,7 +146,7 @@ describe("evaluateRules", () => {
   });
 
   it("supports rule-specific disable and enable blocks", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [
         createSource(
           "README.md",
@@ -179,7 +179,7 @@ describe("evaluateRules", () => {
   });
 
   it("supports full-file disable and enable blocks", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [
         createSource(
           "README.md",
@@ -208,7 +208,7 @@ describe("evaluateRules", () => {
   });
 
   it("treats unmatched enable comments as non-suppressing", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [
         createSource(
           "README.md",
@@ -231,7 +231,7 @@ describe("evaluateRules", () => {
   });
 
   it("treats malformed ignore comments as non-suppressing", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [
         createSource(
           "README.md",
@@ -254,7 +254,7 @@ describe("evaluateRules", () => {
   });
 
   it("does not let ignores affect the wrong file, range, or rule", () => {
-    const diagnostics = evaluateRules(
+    const diagnostics = createLintDiagnostics(
       [
         createSource(
           "README.md",

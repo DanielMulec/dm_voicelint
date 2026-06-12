@@ -10,6 +10,7 @@ import type {
 const ignoreCommentPattern =
   /^\s*<!--\s*voicelint-(disable-next-line|disable|enable)\s+(all|[^\s>]+)\s*-->\s*$/u;
 const fencePattern = /^\s{0,3}(```+|~~~+).*$/u;
+const ignoreDirectiveKinds = new Set<string>(["disable-next-line", "disable", "enable"]);
 
 interface FenceStart {
   readonly marker: "`" | "~";
@@ -156,11 +157,20 @@ function parseIgnoreDirectiveLine(indexedLine: IndexedLine): IgnoreComment | nul
 }
 
 function readIgnoreDirectiveKind(match: RegExpMatchArray): IgnoreDirectiveKind {
-  return readRequiredCaptureGroup(match, 1) as IgnoreDirectiveKind;
+  const directiveKind = readRequiredCaptureGroup(match, 1);
+  if (isIgnoreDirectiveKind(directiveKind)) {
+    return directiveKind;
+  }
+
+  throw new RangeError(`Unsupported VoiceLint ignore directive kind ${directiveKind}.`);
 }
 
 function readIgnoreTarget(match: RegExpMatchArray): IgnoreTarget {
   return readRequiredCaptureGroup(match, 2);
+}
+
+function isIgnoreDirectiveKind(directiveKind: string): directiveKind is IgnoreDirectiveKind {
+  return ignoreDirectiveKinds.has(directiveKind);
 }
 
 function createMalformedIgnoreCommentProblem(
