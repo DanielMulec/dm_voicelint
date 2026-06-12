@@ -124,8 +124,9 @@ Mandatory engineering standards:
 - fixtures for rules and diagnostics
 
 Commit history is part of the project documentation. Commits on `main` must use
-a concise subject plus `Why:`, `How:`, and `Files:` sections so GitHub history
-explains intent and implementation without external chat logs.
+a concise subject plus `What:`, `Why:`, `How:`, `Files:`, and an
+`Implemented with ...` line so GitHub history explains intent and
+implementation without external chat logs.
 
 To enable the repository hooks in a fresh clone, run:
 

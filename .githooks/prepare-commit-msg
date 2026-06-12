@@ -11,9 +11,11 @@ case "$message_source" in
     ;;
 esac
 
-if grep -q '^Why:$' "$message_file" && \
+if grep -q '^What:$' "$message_file" && \
+  grep -q '^Why:$' "$message_file" && \
   grep -q '^How:$' "$message_file" && \
-  grep -q '^Files:$' "$message_file"; then
+  grep -q '^Files:$' "$message_file" && \
+  grep -q '^Implemented with ' "$message_file"; then
   exit 0
 fi
 
@@ -39,6 +41,9 @@ fi
 {
   printf '%s\n' "$subject_line"
   printf '\n'
+  printf 'What:\n'
+  printf '%s\n' '- describe what changed'
+  printf '\n'
   printf 'Why:\n'
   printf '%s\n' '- explain why this change is needed'
   printf '\n'
@@ -47,6 +52,8 @@ fi
   printf '\n'
   printf 'Files:\n'
   cat "$files_block_file"
+  printf '\n'
+  printf 'Implemented with <LLM-Version-Reasoning>\n'
 } > "$template_file"
 
 mv "$template_file" "$message_file"

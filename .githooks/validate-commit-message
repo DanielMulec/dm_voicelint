@@ -28,6 +28,7 @@ fail() {
 
 is_placeholder_line() {
   case "$1" in
+    "describe what changed" | \
     "explain why this change is needed" | \
     "describe the implementation" | \
     "list every changed file in this commit" | \
@@ -46,10 +47,12 @@ subject_line="$(sed -n '/./{p;q;}' "$clean_message_file")"
 [ -n "$subject_line" ] || fail "subject line is required"
 
 subject_seen=0
-state="await_why"
+state="await_what"
+what_count=0
 why_count=0
 how_count=0
 files_count=0
+implemented_with_seen=0
 
 while IFS= read -r line || [ -n "$line" ]
 do
@@ -67,8 +70,14 @@ do
   fi
 
   case "$line" in
+    What:)
+      [ "$state" = "await_what" ] || fail "What: must come before Why:, How:, Files:, and Implemented with"
+      state="in_what"
+      continue
+      ;;
     Why:)
-      [ "$state" = "await_why" ] || fail "Why: must come before How: and Files:"
+      [ "$what_count" -gt 0 ] || fail "Why: requires at least one What bullet first"
+      [ "$state" = "after_what" ] || [ "$state" = "in_what" ] || fail "Why: must come after the What section"
       state="in_why"
       continue
       ;;
@@ -84,11 +93,26 @@ do
       state="in_files"
       continue
       ;;
+    Implemented\ with\ *)
+      implemented_with_value="${line#Implemented with }"
+      [ -n "$implemented_with_value" ] || fail "Implemented with requires a non-empty value"
+      is_placeholder_line "$implemented_with_value" && fail "replace the Implemented with placeholder before committing"
+      [ "$files_count" -gt 0 ] || fail "Implemented with requires at least one Files bullet first"
+      [ "$state" = "after_files" ] || [ "$state" = "in_files" ] || fail "Implemented with must come after the Files section"
+      [ "$implemented_with_seen" -eq 0 ] || fail "Implemented with may only appear once"
+      implemented_with_seen=1
+      state="after_implemented_with"
+      continue
+      ;;
     -\ *)
       bullet_text="${line#- }"
       is_placeholder_line "$bullet_text" && fail "replace template placeholder bullets before committing"
 
       case "$state" in
+        in_what | after_what)
+          what_count=$((what_count + 1))
+          state="after_what"
+          ;;
         in_why | after_why)
           why_count=$((why_count + 1))
           state="after_why"
@@ -103,7 +127,7 @@ do
           printf '%s\n' "$bullet_text" >> "$actual_files_file"
           ;;
         *)
-          fail "bullets are only allowed inside Why, How, or Files sections"
+          fail "bullets are only allowed inside What, Why, How, or Files sections"
           ;;
       esac
       continue
@@ -114,9 +138,11 @@ do
   esac
 done < "$clean_message_file"
 
+[ "$what_count" -gt 0 ] || fail "What: must contain at least one bullet"
 [ "$why_count" -gt 0 ] || fail "Why: must contain at least one bullet"
 [ "$how_count" -gt 0 ] || fail "How: must contain at least one bullet"
 [ "$files_count" -gt 0 ] || fail "Files: must contain at least one bullet"
+[ "$implemented_with_seen" -eq 1 ] || fail "Implemented with must appear exactly once"
 
 LC_ALL=C sort -u "$expected_files_file" | sed '/^[[:space:]]*$/d' > "$expected_sorted_file"
 LC_ALL=C sort -u "$actual_files_file" | sed '/^[[:space:]]*$/d' > "$actual_sorted_file"

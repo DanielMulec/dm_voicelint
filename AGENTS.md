@@ -45,7 +45,7 @@ This file is the working contract for AI coding agents in this repository.
 - Do not create extra worktrees unless the task genuinely requires one.
 - If the repository appears dirty, verify with `git status` before acting on that assumption.
 - Treat commit history as user-facing documentation.
-- Every commit message must use a concise subject plus `Why:`, `How:`, and `Files:` sections.
+- Every commit message must use a concise subject plus `What:`, `Why:`, `How:`, `Files:`, and an `Implemented with ...` line.
 - `Files:` must contain one bullet per changed file in that commit.
 - In a fresh clone, run `git config core.hooksPath .githooks` before relying on these repository hooks.
 - External contributors may use normal GitHub fork and pull request workflows.
