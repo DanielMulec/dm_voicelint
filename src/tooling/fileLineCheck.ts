@@ -41,14 +41,14 @@ export async function checkRepositoryFileLines(
 }
 
 export function formatLineCountResult(
-  result: FileLineCheckResult,
+  lineCheckResult: FileLineCheckResult,
   maxLineCount: number,
 ): string {
-  if (result.failures.length === 0) {
-    return `Checked ${result.checkedFileCount} files. All are within ${maxLineCount} lines.\n`;
+  if (lineCheckResult.failures.length === 0) {
+    return `Checked ${lineCheckResult.checkedFileCount} files. All are within ${maxLineCount} lines.\n`;
   }
 
-  const failureLines = result.failures.map(formatFailure);
+  const failureLines = lineCheckResult.failures.map(formatFailure);
   return [
     `Line count check failed. Code files must stay at or below ${maxLineCount} lines.`,
     ...failureLines,

@@ -81,6 +81,8 @@ function readClosingInlineCodeRun(
 
   while (nextSearchOffset < segmentText.length) {
     const closingRun = readNextInlineCodeRun(segmentText, nextSearchOffset);
+    // Markdown inline code closes only on a backtick run of equal length. Shorter
+    // or longer runs stay searchable text and must not end the exclusion range.
     if (shouldStopClosingInlineCodeSearch(openingRun, closingRun)) {
       return closingRun;
     }

@@ -25,14 +25,14 @@ describe("checkRepositoryFileLines", () => {
       createRepeatedLines("export const value = 1;", 401),
     );
 
-    const result = await checkRepositoryFileLines({
+    const lineCheckResult = await checkRepositoryFileLines({
       rootDirectoryPath,
       directoryNames: ["src", "test", "scripts"],
       maxLineCount: 400,
     });
 
-    expect(result.checkedFileCount).toBe(1);
-    expect(result.failures).toEqual([
+    expect(lineCheckResult.checkedFileCount).toBe(1);
+    expect(lineCheckResult.failures).toEqual([
       {
         filePath: "src/oversized.ts",
         lineCount: 401,
@@ -48,14 +48,14 @@ describe("checkRepositoryFileLines", () => {
       createGeneratedFile(450),
     );
 
-    const result = await checkRepositoryFileLines({
+    const lineCheckResult = await checkRepositoryFileLines({
       rootDirectoryPath,
       directoryNames: ["src", "test", "scripts"],
       maxLineCount: 400,
     });
 
-    expect(result.checkedFileCount).toBe(1);
-    expect(result.failures).toEqual([]);
+    expect(lineCheckResult.checkedFileCount).toBe(1);
+    expect(lineCheckResult.failures).toEqual([]);
   });
 });
 

@@ -54,6 +54,8 @@ function appendRegexMatch(
 ): void {
   const matchedText = regexMatch[0];
   if (matchedText.length === 0) {
+    // Global regular expressions do not advance after zero-width matches, so
+    // advance manually to keep malformed or boundary-only rules from looping.
     segmentExpression.lastIndex = regexMatch.index + 1;
     return;
   }

@@ -24,6 +24,16 @@ interface StateParseSuccess<TState> {
   readonly nextState: TState;
 }
 
+interface ParsedOptionValue {
+  readonly nextIndex: number;
+  readonly optionValue: string;
+}
+
+interface ParsedOutputFormat {
+  readonly nextIndex: number;
+  readonly outputFormat: OutputFormat;
+}
+
 type StateParseResult<TState> = Result<StateParseSuccess<TState>, ReturnType<typeof createUsageError>>;
 type StandardOptionParser = (
   tokens: readonly string[],
@@ -217,16 +227,16 @@ function parseStandardConfigOption(
   index: number,
   state: StandardLintState,
 ): StateParseResult<StandardLintState> {
-  const valueResult = readRequiredOptionValue(tokens, index, "--config");
-  return valueResult.ok
+  const configPathResult = readRequiredOptionValue(tokens, index, "--config");
+  return configPathResult.ok
     ? ok({
-        nextIndex: valueResult.value.nextIndex,
+        nextIndex: configPathResult.value.nextIndex,
         nextState: {
           ...state,
-          configPath: valueResult.value.value,
+          configPath: configPathResult.value.optionValue,
         },
       })
-    : valueResult;
+    : configPathResult;
 }
 
 function parseStandardFormatOption(
@@ -240,7 +250,7 @@ function parseStandardFormatOption(
         nextIndex: formatResult.value.nextIndex,
         nextState: {
           ...state,
-          format: formatResult.value.value,
+          format: formatResult.value.outputFormat,
         },
       })
     : formatResult;
@@ -265,16 +275,16 @@ function parseStandardStdinFilePathOption(
   index: number,
   state: StandardLintState,
 ): StateParseResult<StandardLintState> {
-  const valueResult = readRequiredOptionValue(tokens, index, "--stdin-file-path");
-  return valueResult.ok
+  const stdinFilePathResult = readRequiredOptionValue(tokens, index, "--stdin-file-path");
+  return stdinFilePathResult.ok
     ? ok({
-        nextIndex: valueResult.value.nextIndex,
+        nextIndex: stdinFilePathResult.value.nextIndex,
         nextState: {
           ...state,
-          stdinFilePath: valueResult.value.value,
+          stdinFilePath: stdinFilePathResult.value.optionValue,
         },
       })
-    : valueResult;
+    : stdinFilePathResult;
 }
 
 function parseDiffConfigOption(
@@ -282,16 +292,16 @@ function parseDiffConfigOption(
   index: number,
   state: DiffLintState,
 ): StateParseResult<DiffLintState> {
-  const valueResult = readRequiredOptionValue(tokens, index, "--config");
-  return valueResult.ok
+  const configPathResult = readRequiredOptionValue(tokens, index, "--config");
+  return configPathResult.ok
     ? ok({
-        nextIndex: valueResult.value.nextIndex,
+        nextIndex: configPathResult.value.nextIndex,
         nextState: {
           ...state,
-          configPath: valueResult.value.value,
+          configPath: configPathResult.value.optionValue,
         },
       })
-    : valueResult;
+    : configPathResult;
 }
 
 function parseDiffFormatOption(
@@ -305,7 +315,7 @@ function parseDiffFormatOption(
         nextIndex: formatResult.value.nextIndex,
         nextState: {
           ...state,
-          format: formatResult.value.value,
+          format: formatResult.value.outputFormat,
         },
       })
     : formatResult;
@@ -316,32 +326,32 @@ function parseInitAgentOption(
   index: number,
   state: InitState,
 ): StateParseResult<InitState> {
-  const valueResult = readRequiredOptionValue(tokens, index, "--agent");
-  if (!valueResult.ok) {
-    return valueResult;
+  const agentNameResult = readRequiredOptionValue(tokens, index, "--agent");
+  if (!agentNameResult.ok) {
+    return agentNameResult;
   }
 
-  return valueResult.value.value === "codex"
+  return agentNameResult.value.optionValue === "codex"
     ? ok({
-        nextIndex: valueResult.value.nextIndex,
+        nextIndex: agentNameResult.value.nextIndex,
         nextState: {
           ...state,
           agent: "codex",
         },
       })
-    : err(createUsageError(`Unsupported agent: ${valueResult.value.value}`));
+    : err(createUsageError(`Unsupported agent: ${agentNameResult.value.optionValue}`));
 }
 
 function readRequiredOptionValue(
   tokens: readonly string[],
   index: number,
   optionName: string,
-): Result<{ nextIndex: number; value: string }, ReturnType<typeof createUsageError>> {
-  const value = tokens[index + 1];
-  return typeof value === "string"
+): Result<ParsedOptionValue, ReturnType<typeof createUsageError>> {
+  const optionValue = tokens[index + 1];
+  return typeof optionValue === "string"
     ? ok({
         nextIndex: index + 2,
-        value,
+        optionValue,
       })
     : err(createUsageError(`Missing value for ${optionName}.`));
 }
@@ -349,22 +359,22 @@ function readRequiredOptionValue(
 function readOutputFormat(
   tokens: readonly string[],
   index: number,
-): Result<{ nextIndex: number; value: OutputFormat }, ReturnType<typeof createUsageError>> {
-  const valueResult = readRequiredOptionValue(tokens, index, "--format");
-  if (!valueResult.ok) {
-    return valueResult;
+): Result<ParsedOutputFormat, ReturnType<typeof createUsageError>> {
+  const formatTokenResult = readRequiredOptionValue(tokens, index, "--format");
+  if (!formatTokenResult.ok) {
+    return formatTokenResult;
   }
 
-  return isOutputFormat(valueResult.value.value)
+  return isOutputFormat(formatTokenResult.value.optionValue)
     ? ok({
-        nextIndex: valueResult.value.nextIndex,
-        value: valueResult.value.value,
+        nextIndex: formatTokenResult.value.nextIndex,
+        outputFormat: formatTokenResult.value.optionValue,
       })
-    : err(createUsageError(`Unknown format: ${valueResult.value.value}`));
+    : err(createUsageError(`Unknown format: ${formatTokenResult.value.optionValue}`));
 }
 
-function isOutputFormat(value: string): value is OutputFormat {
-  return supportedFormats.has(value);
+function isOutputFormat(formatToken: string): formatToken is OutputFormat {
+  return supportedFormats.has(formatToken);
 }
 
 function isOptionToken(token: string): boolean {

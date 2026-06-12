@@ -121,9 +121,11 @@ function readColumnNumber(
   lineStartOffset: number,
   offset: number,
 ): number {
+  // Diagnostics are reported in user-visible Unicode code points instead of
+  // JavaScript UTF-16 units so emoji and other astral symbols do not shift columns.
   return countCodePoints(sourceText.slice(lineStartOffset, offset)) + 1;
 }
 
-function countCodePoints(value: string): number {
-  return Array.from(value).length;
+function countCodePoints(text: string): number {
+  return Array.from(text).length;
 }

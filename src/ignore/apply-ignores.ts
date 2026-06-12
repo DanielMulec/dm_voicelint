@@ -153,6 +153,9 @@ function readLastIgnoredLine(ignoreLineRange: IgnoreLineRange): number {
 }
 
 function readDiagnosticLastCoveredLine(diagnostic: Diagnostic): number {
+  // A range ending at column 1 of the next line covers only the previous line's
+  // content. This keeps disable comments from suppressing diagnostics on a line
+  // merely because the matched range ends at that line's start offset.
   return diagnostic.endColumn === 1 && diagnostic.endLine > diagnostic.line
     ? diagnostic.endLine - 1
     : diagnostic.endLine;

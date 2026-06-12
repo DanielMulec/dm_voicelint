@@ -56,7 +56,7 @@ describe("runCli", () => {
     const packageManifest = JSON.parse(
       await readFile(new URL("../../package.json", import.meta.url), "utf8"),
     ) as unknown;
-    const packageVersion = readPackageVersionFromValue(packageManifest);
+    const packageVersion = readPackageVersionFromManifest(packageManifest);
 
     expect(exitCode).toBe(0);
     expect(packageVersion).not.toBeNull();
@@ -155,8 +155,8 @@ const runCliWithWorkingDirectory = async (
   }
 };
 
-const readPackageVersionFromValue = (value: unknown): string | null => {
-  const parsedManifest = packageManifestSchema.safeParse(value);
+const readPackageVersionFromManifest = (manifestValue: unknown): string | null => {
+  const parsedManifest = packageManifestSchema.safeParse(manifestValue);
   return parsedManifest.success ? parsedManifest.data.version : null;
 };
 

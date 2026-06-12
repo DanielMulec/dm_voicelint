@@ -126,9 +126,9 @@ function isSemanticRuleValue(ruleValue: unknown): boolean {
 }
 
 function isObjectValue(
-  value: unknown,
-): value is { readonly type?: unknown } {
-  return typeof value === "object" && value !== null;
+  ruleValue: unknown,
+): ruleValue is { readonly type?: unknown } {
+  return typeof ruleValue === "object" && ruleValue !== null;
 }
 
 function createLoadedRule(

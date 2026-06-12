@@ -96,12 +96,12 @@ function parseImmediateCommand(args: readonly string[]): HelpCommand | VersionCo
   return parseImmediateFlag(args[0]);
 }
 
-function parseImmediateFlag(value: string | undefined): HelpCommand | VersionCommand | null {
-  if (isHelpFlag(value)) {
+function parseImmediateFlag(flagToken: string | undefined): HelpCommand | VersionCommand | null {
+  if (isHelpFlag(flagToken)) {
     return { commandName: "help" };
   }
 
-  return isVersionFlag(value) ? { commandName: "version" } : null;
+  return isVersionFlag(flagToken) ? { commandName: "version" } : null;
 }
 
 function parseDeferredCommand(args: readonly string[]): CliParseResult {
@@ -245,10 +245,10 @@ function createStdinFilePathProperty(
   return typeof stdinFilePath === "string" ? { stdinFilePath } : {};
 }
 
-function isHelpFlag(value: string | undefined): boolean {
-  return typeof value === "string" && helpFlags.has(value);
+function isHelpFlag(flagToken: string | undefined): boolean {
+  return typeof flagToken === "string" && helpFlags.has(flagToken);
 }
 
-function isVersionFlag(value: string | undefined): boolean {
-  return typeof value === "string" && versionFlags.has(value);
+function isVersionFlag(flagToken: string | undefined): boolean {
+  return typeof flagToken === "string" && versionFlags.has(flagToken);
 }

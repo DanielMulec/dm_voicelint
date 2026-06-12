@@ -67,6 +67,9 @@ function findRepoRoot(
 }
 
 function collectChangedCandidatePaths(repoRoot: string): readonly string[] {
+  // Changed mode includes untracked files because developers often lint before
+  // staging newly created docs. Repositories without HEAD need ls-files instead
+  // of diff so the first commit can still be linted.
   const trackedChangedPaths = hasHeadCommit(repoRoot)
     ? runGitLines(repoRoot, ["diff", "--name-only", "--diff-filter=ACMR", "HEAD", "--"])
     : runGitLines(repoRoot, ["ls-files", "--cached", "--others", "--exclude-standard"]);
@@ -75,6 +78,8 @@ function collectChangedCandidatePaths(repoRoot: string): readonly string[] {
 }
 
 function collectStagedCandidatePaths(repoRoot: string): readonly string[] {
+  // --root makes staged additions visible before the repository has its first
+  // commit, matching how Git hooks run in freshly initialized projects.
   return runGitLines(repoRoot, ["diff", "--cached", "--name-only", "--diff-filter=ACMR", "--root", "--"])
     .map(normalizeRelativePath)
     .sort();
