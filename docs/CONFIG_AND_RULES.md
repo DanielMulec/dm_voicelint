@@ -25,6 +25,20 @@ v0.1 lints exactly these file types:
 Markdown and MDX use Markdown-aware segmentation. Plain text uses line and
 paragraph segmentation.
 
+Markdown and MDX segmentation rules:
+
+- headings, paragraphs, and list items are the text-bearing segments
+- fenced code blocks are skipped
+- inline code spans stay in the source text but are excluded from literal
+  checks
+
+Location rules:
+
+- line and column numbers are 1-based
+- columns count Unicode code points, not bytes
+- end positions are exclusive
+- both LF and CRLF inputs are supported
+
 ## Default Discovery Rules
 
 Default include behavior:

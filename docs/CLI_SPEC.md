@@ -43,6 +43,14 @@ Rules:
 - Output ordering is deterministic: file path, then line, then column, then
   rule id.
 
+Segmentation rules for supported text files:
+
+- Markdown and MDX segment headings, paragraphs, and list items
+- Markdown and MDX skip fenced code blocks
+- Markdown and MDX exclude inline code spans from literal checks
+- Plain text segments lines and paragraphs
+- Line and column locations support both LF and CRLF inputs
+
 ## Stdin Mode
 
 Stdin mode is active only when:

@@ -103,6 +103,19 @@ The v0.1 config fields are:
 Unknown configured rule ids are config failures, not warnings, so misspelled
 rule overrides do not silently disable lint behavior.
 
+## Source Locations And Markdown Literal Scope
+
+VoiceLint diagnostic locations use 1-based Unicode code-point columns, not byte
+offsets, and end positions are exclusive.
+
+Both LF and CRLF inputs must map to the same logical line and column model.
+
+For Markdown and MDX mechanical literal checks:
+
+- headings, paragraphs, and list items are the segmentable text blocks
+- fenced code blocks are skipped
+- inline code spans are excluded from literal matching
+
 ## Mechanical Rule Model
 
 VoiceLint v0.1 implements mechanical rules only.

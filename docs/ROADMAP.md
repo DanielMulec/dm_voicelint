@@ -10,10 +10,12 @@ Completed phases:
 - phase 3: CLI parser and command shell
 - phase 4: input discovery
 - phase 5: config loading and baseline init
+- phase 6: segmentation and source locations
 
 The repository now has a compiled TypeScript CLI shell, CI, and tests. Real
 lint execution has not started yet, but the CLI can now discover the text
-sources it will later lint through a real repo-local config.
+sources it will later lint through a real repo-local config and stable segment
+locations.
 
 Input discovery landed before config loading in implementation history, but
 both are now complete in `main`.
@@ -28,10 +30,11 @@ both are now complete in `main`.
    `voicelint init` file creation.
 4. Completed: file discovery for paths, `changed`, `staged`, and stdin content,
    plus staged reads from the Git index.
-5. Next: Markdown and plain-text segmentation with stable source locations.
-6. Next: mechanical rule loading and evaluation.
-7. Next: diagnostic assembly and `pretty` / `json` / `agent` formatting.
-8. Next: ignore handling for default ignores and Markdown/MDX inline
+5. Completed: Markdown/plain-text segmentation with stable source locations.
+6. Next: mechanical rule loading.
+7. Next: rule evaluation and diagnostic assembly.
+8. Next: `pretty` / `json` / `agent` formatting plus ignore handling for
+   default ignores and Markdown/MDX inline
    directives.
 9. Next: optional Codex hook setup through
    `.codex/hooks.json`.

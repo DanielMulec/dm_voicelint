@@ -1,3 +1,5 @@
+import { extname } from "node:path";
+
 import type { ParsedLintCommand } from "../cli/args.js";
 import { exitCodes } from "../cli/exit-code.js";
 import {
@@ -5,6 +7,9 @@ import {
   type LoadedVoiceLintConfig,
 } from "../config/load-config.js";
 import { discoverInputSources, type DiscoveredInputSources } from "../input/input-mode.js";
+import type { TextSource } from "../input/read-source.js";
+import { createMarkdownSegments } from "../segments/markdown-segments.js";
+import { createPlainTextSegments } from "../segments/plain-text-segments.js";
 import { ok, type CommandResult } from "../shared/result.js";
 
 export async function executeLintCommand(
@@ -47,6 +52,7 @@ function createLintShellText(
   discoveredInputSources: DiscoveredInputSources,
   loadedConfig: LoadedVoiceLintConfig,
 ): string {
+  const segmentCount = countSegments(discoveredInputSources.sources);
   return [
     "VoiceLint input discovery completed.",
     `Profile: ${loadedConfig.profile}`,
@@ -54,6 +60,7 @@ function createLintShellText(
     `Input mode: ${discoveredInputSources.inputMode}`,
     `Output format: ${command.format}`,
     `Source count: ${discoveredInputSources.sources.length}`,
+    `Segment count: ${segmentCount}`,
     ...createSourcePathLines(discoveredInputSources),
     "Implementation pending.",
     "",
@@ -64,4 +71,19 @@ function createSourcePathLines(
   discoveredInputSources: DiscoveredInputSources,
 ): readonly string[] {
   return discoveredInputSources.sources.map((source) => `- ${source.path}`);
+}
+
+function countSegments(sources: readonly TextSource[]): number {
+  return sources.reduce((segmentCount, source) => segmentCount + readSegments(source).length, 0);
+}
+
+function readSegments(source: TextSource) {
+  return isMarkdownSource(source.path)
+    ? createMarkdownSegments(source.content)
+    : createPlainTextSegments(source.content);
+}
+
+function isMarkdownSource(sourcePath: string): boolean {
+  const fileExtension = extname(sourcePath).toLowerCase();
+  return fileExtension === ".md" || fileExtension === ".mdx";
 }

@@ -40,6 +40,7 @@ describe("runCli", () => {
     expect(exitCode).toBe(0);
     expect(outputText).toContain("VoiceLint");
     expect(outputText).toContain("v0.0.5 provides the TypeScript CLI shell, repo-local config loading");
+    expect(outputText).toContain("text segmentation for");
     expect(outputText).toContain(
       "voicelint --stdin [--stdin-file-path PATH] [--config PATH] [--format pretty|json|agent]",
     );
@@ -105,6 +106,7 @@ describe("runCli", () => {
     expect(errorText).toContain(`Config path: ${configPath}`);
     expect(errorText).toContain("Input mode: stdin");
     expect(errorText).toContain("Source count: 1");
+    expect(errorText).toContain("Segment count: 2");
     expect(errorText).toContain("- <stdin>");
   });
 

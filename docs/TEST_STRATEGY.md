@@ -37,6 +37,10 @@ Current implemented tests:
 - missing-path and unsupported-file handling
 - changed-mode Git fixture discovery
 - staged-mode Git fixture discovery with index content reads
+- Markdown heading, paragraph, and list-item segmentation
+- fenced-code skipping and inline-code exclusion behavior
+- CRLF and Unicode-aware source location mapping
+- empty-file segmentation behavior
 - file-line guard behavior
 
 ## v0.1 Test Layers

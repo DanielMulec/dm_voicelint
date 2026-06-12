@@ -20,6 +20,7 @@ Implemented so far:
 - repo-local config loading and validation for lint commands
 - baseline `voicelint init` scaffolding for the repo-local config and rule files
 - input discovery for paths, `changed`, `staged`, and stdin-backed sources
+- Markdown/plain-text segmentation with stable source locations
 
 VoiceLint v0.1 is deterministic mechanical linting only. It does not do
 semantic judging, provider calls, or file rewriting. Diagnostics may include
@@ -27,7 +28,6 @@ suggestions, but linting never edits user text.
 
 Not implemented yet:
 
-- segmentation
 - rule loading
 - rule evaluation
 - diagnostics

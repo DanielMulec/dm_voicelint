@@ -10,6 +10,9 @@ Rules:
 - `error` diagnostics are blocking
 - `warning` diagnostics are non-blocking
 - no v0.1 diagnostic includes semantic `confidence`
+- location columns are 1-based Unicode code-point columns
+- diagnostic end positions are exclusive
+- both LF and CRLF inputs must map to stable locations
 
 ## Diagnostic Fields
 
