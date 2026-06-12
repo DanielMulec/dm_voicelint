@@ -1,0 +1,9 @@
+id: style.no-en-dash
+type: mechanical
+severity: error
+description: Do not use en dashes.
+
+match:
+  pattern: "–"
+
+message: "Use to, through, a hyphen, or explicit punctuation instead of an en dash."

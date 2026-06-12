@@ -1,0 +1,18 @@
+profile: product
+
+rules:
+  style.no-em-dash: error
+  style.no-en-dash: warning
+  copy.avoid-generic-product-words: warning
+  product.preferred-terms: warning
+
+include:
+  - "**/*.md"
+  - "**/*.mdx"
+  - "**/*.txt"
+
+exclude:
+  - "node_modules/**"
+  - "dist/**"
+  - "coverage/**"
+  - "test/fixtures/**"

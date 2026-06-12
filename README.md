@@ -24,6 +24,8 @@ Implemented so far:
 - YAML mechanical rule loading and deterministic rule evaluation
 - pretty, JSON, and agent diagnostic output
 - Markdown and MDX ignore comment handling
+- end-to-end built-package CLI coverage for init, lint, stdin, changed, and staged
+- repo-local baseline config and rules for self-dogfooding
 
 VoiceLint v0.1 is deterministic mechanical linting only. It does not do
 semantic judging, provider calls, or file rewriting. Diagnostics may include

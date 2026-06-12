@@ -108,7 +108,9 @@ describe("runCli", () => {
   });
 
   it("returns a clear error when a lint command is missing config", async () => {
-    const { exitCode, outputText, errorText } = await runCliWithStreams(
+    const workspacePath = await createWorkspace();
+    const { exitCode, outputText, errorText } = await runCliWithWorkingDirectory(
+      workspacePath,
       ["--stdin"],
       "stdin body\n",
     );
@@ -136,6 +138,21 @@ const runCliWithStreams = async (
     outputText: output.text,
     errorText: errorOutput.text,
   };
+};
+
+const runCliWithWorkingDirectory = async (
+  workingDirectory: string,
+  args: readonly string[],
+  inputText = "",
+): Promise<{ exitCode: number; outputText: string; errorText: string }> => {
+  const previousWorkingDirectory = process.cwd();
+  process.chdir(workingDirectory);
+
+  try {
+    return await runCliWithStreams(args, inputText);
+  } finally {
+    process.chdir(previousWorkingDirectory);
+  }
 };
 
 const readPackageVersionFromValue = (value: unknown): string | null => {
