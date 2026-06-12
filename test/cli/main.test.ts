@@ -39,7 +39,7 @@ describe("runCli", () => {
 
     expect(exitCode).toBe(0);
     expect(outputText).toContain("VoiceLint");
-    expect(outputText).toContain("v0.0.5 provides the TypeScript CLI, repo-local config loading");
+    expect(outputText).toContain("v0.1.0 provides the TypeScript CLI, repo-local config loading");
     expect(outputText).toContain("YAML mechanical rule loading");
     expect(outputText).toContain(
       "voicelint --stdin [--stdin-file-path PATH] [--config PATH] [--format pretty|json|agent]",

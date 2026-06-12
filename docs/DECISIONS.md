@@ -20,8 +20,7 @@ Fallback package names:
 - `@danielmulec/voicelint`
 - `@voicelint/cli`
 
-The current pre-release package version is `0.0.5`. The initial publication
-may use the `next` dist-tag.
+The current package version is `0.1.0`.
 
 ## License
 
