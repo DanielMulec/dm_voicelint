@@ -172,6 +172,26 @@ VoiceLint v0.1 supports exactly these output formats:
 
 SARIF is deferred until after the deterministic CLI is working.
 
+## Ignore Directives
+
+VoiceLint v0.1 inline ignore directives are limited to Markdown and MDX.
+
+Supported forms:
+
+- `<!-- voicelint-disable RULE_ID -->`
+- `<!-- voicelint-enable RULE_ID -->`
+- `<!-- voicelint-disable-next-line RULE_ID -->`
+- `all` in place of `RULE_ID` for full-disable behavior
+
+Behavior:
+
+- `disable-next-line` affects only the following source line
+- `disable` starts on the following source line and remains active until the
+  matching `enable` or end-of-file
+- `enable` only matches an earlier `disable` for the exact same target
+- malformed ignore comments never suppress diagnostics
+- unmatched `enable` comments never suppress diagnostics
+
 ## Init And Codex Hook Setup
 
 `voicelint init` should create a useful default repo-local setup.

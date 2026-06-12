@@ -18,7 +18,7 @@ text without rewriting files.
 | 6. Segmentation and source locations | complete | Markdown/plain-text segmentation with stable line and column mapping |
 | 7. Rule loading | complete | YAML rule loading into typed mechanical rule definitions |
 | 8. Rule evaluation and diagnostics | complete | Mechanical evaluation, source mapping, and blocking semantics |
-| 9. CLI formatting and ignores | pending | Formatter polish plus inline ignore directives |
+| 9. CLI formatting and ignores | complete | Formatter polish plus inline ignore directives |
 | 10. Codex hook setup | pending | `.codex/hooks.json` merge path for `init --agent codex` |
 | 11. Release readiness | pending | CI checks, package verification, release checklist completion |
 
@@ -85,13 +85,12 @@ Phase 8 outputs now in repo:
 
 ## Current Milestone
 
-The next implementation milestone is phase 9: formatter polish and inline
-ignore directives.
+The next implementation milestone is phase 10: project-local Codex hook setup.
 
-Required outputs for phase 9:
+Required outputs for phase 10:
 
-- finalize `pretty`, `json`, and `agent` output details against the CLI docs
-- add inline ignore directive parsing and enforcement
+- merge VoiceLint into `.codex/hooks.json` without overwriting unrelated hooks
+- back up existing hook files before editing them
 
 ## Work Breakdown
 

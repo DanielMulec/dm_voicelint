@@ -161,3 +161,6 @@ We understand how frustrating this must be.
 ```
 
 Ignores should support rule ids and full-disable blocks.
+
+Malformed ignore comments and unmatched `enable` comments are inert. They do
+not suppress any diagnostics.

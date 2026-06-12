@@ -21,6 +21,9 @@ Implemented so far:
 - baseline `voicelint init` scaffolding for the repo-local config and rule files
 - input discovery for paths, `changed`, `staged`, and stdin-backed sources
 - Markdown/plain-text segmentation with stable source locations
+- YAML mechanical rule loading and deterministic rule evaluation
+- pretty, JSON, and agent diagnostic output
+- Markdown and MDX ignore comment handling
 
 VoiceLint v0.1 is deterministic mechanical linting only. It does not do
 semantic judging, provider calls, or file rewriting. Diagnostics may include
@@ -28,10 +31,6 @@ suggestions, but linting never edits user text.
 
 Not implemented yet:
 
-- rule loading
-- rule evaluation
-- diagnostics
-- ignore handling
 - Codex hook setup through `init --agent codex`
 
 ## Planned CLI Shape

@@ -93,6 +93,205 @@ describe("evaluateRules", () => {
 
     expect(diagnostics).toHaveLength(1);
   });
+
+  it("supports disable-next-line for a specific rule", () => {
+    const diagnostics = evaluateRules(
+      [
+        createSource(
+          "README.md",
+          [
+            "<!-- voicelint-disable-next-line style.no-em-dash -->",
+            "Before — after",
+            "Before — after",
+          ].join("\n"),
+        ),
+      ],
+      [createLiteralPatternRule("style.no-em-dash", "—")],
+      "product",
+    );
+
+    expect(diagnostics).toEqual([
+      expect.objectContaining({
+        line: 3,
+        ruleId: "style.no-em-dash",
+      }),
+    ]);
+  });
+
+  it("supports disable-next-line for all rules", () => {
+    const diagnostics = evaluateRules(
+      [
+        createSource(
+          "README.md",
+          [
+            "<!-- voicelint-disable-next-line all -->",
+            "Before — after with a seamless workflow.",
+            "Before — after",
+          ].join("\n"),
+        ),
+      ],
+      [
+        createLiteralPatternRule("style.no-em-dash", "—"),
+        createSubstitutionRule(),
+      ],
+      "product",
+    );
+
+    expect(diagnostics).toEqual([
+      expect.objectContaining({
+        line: 3,
+        ruleId: "style.no-em-dash",
+      }),
+    ]);
+  });
+
+  it("supports rule-specific disable and enable blocks", () => {
+    const diagnostics = evaluateRules(
+      [
+        createSource(
+          "README.md",
+          [
+            "<!-- voicelint-disable copy.avoid-generic-product-words -->",
+            "A seamless workflow.",
+            "Before — after",
+            "<!-- voicelint-enable copy.avoid-generic-product-words -->",
+            "A seamless workflow.",
+          ].join("\n"),
+        ),
+      ],
+      [
+        createLiteralPatternRule("style.no-em-dash", "—"),
+        createSubstitutionRule(),
+      ],
+      "product",
+    );
+
+    expect(diagnostics).toEqual([
+      expect.objectContaining({
+        line: 3,
+        ruleId: "style.no-em-dash",
+      }),
+      expect.objectContaining({
+        line: 5,
+        ruleId: "copy.avoid-generic-product-words",
+      }),
+    ]);
+  });
+
+  it("supports full-file disable and enable blocks", () => {
+    const diagnostics = evaluateRules(
+      [
+        createSource(
+          "README.md",
+          [
+            "<!-- voicelint-disable all -->",
+            "Before — after",
+            "A seamless workflow.",
+            "<!-- voicelint-enable all -->",
+            "Before — after",
+          ].join("\n"),
+        ),
+      ],
+      [
+        createLiteralPatternRule("style.no-em-dash", "—"),
+        createSubstitutionRule(),
+      ],
+      "product",
+    );
+
+    expect(diagnostics).toEqual([
+      expect.objectContaining({
+        line: 5,
+        ruleId: "style.no-em-dash",
+      }),
+    ]);
+  });
+
+  it("treats unmatched enable comments as non-suppressing", () => {
+    const diagnostics = evaluateRules(
+      [
+        createSource(
+          "README.md",
+          [
+            "<!-- voicelint-enable style.no-em-dash -->",
+            "Before — after",
+          ].join("\n"),
+        ),
+      ],
+      [createLiteralPatternRule("style.no-em-dash", "—")],
+      "product",
+    );
+
+    expect(diagnostics).toEqual([
+      expect.objectContaining({
+        line: 2,
+        ruleId: "style.no-em-dash",
+      }),
+    ]);
+  });
+
+  it("treats malformed ignore comments as non-suppressing", () => {
+    const diagnostics = evaluateRules(
+      [
+        createSource(
+          "README.md",
+          [
+            "<!-- voicelint-disable -->",
+            "Before — after",
+          ].join("\n"),
+        ),
+      ],
+      [createLiteralPatternRule("style.no-em-dash", "—")],
+      "product",
+    );
+
+    expect(diagnostics).toEqual([
+      expect.objectContaining({
+        line: 2,
+        ruleId: "style.no-em-dash",
+      }),
+    ]);
+  });
+
+  it("does not let ignores affect the wrong file, range, or rule", () => {
+    const diagnostics = evaluateRules(
+      [
+        createSource(
+          "README.md",
+          [
+            "<!-- voicelint-disable-next-line style.no-em-dash -->",
+            "Before — after",
+            "Before — after",
+            "A seamless workflow.",
+          ].join("\n"),
+        ),
+        createSource("notes.md", "Before — after\n"),
+      ],
+      [
+        createLiteralPatternRule("style.no-em-dash", "—"),
+        createSubstitutionRule(),
+      ],
+      "product",
+    );
+
+    expect(diagnostics).toEqual([
+      expect.objectContaining({
+        file: "notes.md",
+        line: 1,
+        ruleId: "style.no-em-dash",
+      }),
+      expect.objectContaining({
+        file: "README.md",
+        line: 3,
+        ruleId: "style.no-em-dash",
+      }),
+      expect.objectContaining({
+        file: "README.md",
+        line: 4,
+        ruleId: "copy.avoid-generic-product-words",
+      }),
+    ]);
+  });
 });
 
 function createSource(path: string, content: string): TextSource {

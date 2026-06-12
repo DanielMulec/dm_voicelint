@@ -220,3 +220,10 @@ Supported directives:
 ```
 
 `all` may be used instead of a rule id for full-disable blocks.
+
+`disable-next-line` suppresses only the following source line. `disable`
+suppresses matching diagnostics from the next line until a matching `enable` or
+end-of-file.
+
+Malformed ignore comments and unmatched `enable` comments never suppress
+diagnostics.

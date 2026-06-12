@@ -5,6 +5,8 @@ import {
   deduplicateDiagnostics,
   sortDiagnostics,
 } from "../diagnostics/sort-diagnostics.js";
+import { applyIgnores } from "../ignore/apply-ignores.js";
+import { parseIgnoreComments } from "../ignore/ignore-parser.js";
 import { createLineIndex } from "../locations/line-index.js";
 import type { TextSource } from "../input/read-source.js";
 import { createMarkdownSegments } from "../segments/markdown-segments.js";
@@ -35,11 +37,15 @@ function evaluateSourceRules(
   profile: string,
 ): readonly Diagnostic[] {
   const lineIndex = createLineIndex(source.content);
-  return readRuleSegments(source).flatMap((segment) =>
+  const diagnostics = readRuleSegments(source).flatMap((segment) =>
     rules.flatMap((rule) =>
       evaluateSingleRule(rule, source.path, profile, lineIndex, segment)
-    )
+    ),
   );
+
+  return isMarkdownSource(source.path)
+    ? applyIgnores(diagnostics, parseIgnoreComments(source.content))
+    : diagnostics;
 }
 
 function evaluateSingleRule(
