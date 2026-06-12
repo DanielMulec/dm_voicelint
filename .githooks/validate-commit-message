@@ -66,6 +66,10 @@ do
   fi
 
   if [ -z "$line" ]; then
+    if [ "$state" = "after_files" ] || [ "$state" = "in_files" ] || [ "$state" = "after_files_blank" ]; then
+      state="after_files_blank"
+    fi
+
     continue
   fi
 
@@ -98,7 +102,7 @@ do
       [ -n "$implemented_with_value" ] || fail "Implemented with requires a non-empty value"
       is_placeholder_line "$implemented_with_value" && fail "replace the Implemented with placeholder before committing"
       [ "$files_count" -gt 0 ] || fail "Implemented with requires at least one Files bullet first"
-      [ "$state" = "after_files" ] || [ "$state" = "in_files" ] || fail "Implemented with must come after the Files section"
+      [ "$state" = "after_files_blank" ] || fail "Implemented with must be separated from Files by a blank line"
       [ "$implemented_with_seen" -eq 0 ] || fail "Implemented with may only appear once"
       implemented_with_seen=1
       state="after_implemented_with"
