@@ -65,7 +65,7 @@ Config `exclude` patterns add to this default list.
 | Field | Required | Type | Meaning |
 | --- | --- | --- | --- |
 | `profile` | yes | string | Active profile name for diagnostics |
-| `rules` | no | map of known rule id to `error`, `warning`, or `off` | Overrides per-rule severity from rule files |
+| `rules` | no | map of rule id to `error` or `warning` | Overrides per-rule severity from rule files |
 | `include` | no | list of globs | Narrows discovered files before linting |
 | `exclude` | no | list of globs | Adds repo-local exclude patterns |
 
@@ -91,7 +91,7 @@ exclude:
   - "coverage/**"
 ```
 
-Unknown rule ids in `rules` fail config validation instead of being ignored.
+Unknown rule ids in `rules` fail rule resolution instead of being ignored.
 
 ## Rule Schema
 
@@ -100,6 +100,9 @@ Each YAML rule file must declare exactly one mechanical matcher form:
 - `match`
 - `terms`
 - `substitution`
+
+Pattern rules are literal substring checks by default. Regex evaluation is
+enabled only when `match.regex: true` is present.
 
 Shared fields:
 
@@ -155,11 +158,16 @@ substitution:
 message: "Replace generic product-copy language with a concrete claim."
 ```
 
+Literal matcher rules are case-sensitive in v0.1:
+
+- `match.pattern`
+- `terms`
+- `substitution`
+
 Precedence:
 
 - rule file `severity` is the default
 - config `rules.<id>` overrides severity
-- config may set a rule to `off`
 
 ## Baseline Rules Created By `init`
 

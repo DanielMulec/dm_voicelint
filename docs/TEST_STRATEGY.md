@@ -7,8 +7,8 @@ test strategy is built around deterministic mechanical behavior.
 
 ## Current Repository Verification
 
-The repository now has real tooling verification even though lint execution is
-still a shell.
+The repository now has real tooling verification and deterministic lint
+execution.
 
 Current implemented verification commands:
 
@@ -40,6 +40,12 @@ Current implemented tests:
 - Markdown heading, paragraph, and list-item segmentation
 - fenced-code skipping and inline-code exclusion behavior
 - CRLF and Unicode-aware source location mapping
+- YAML rule loading and validation
+- semantic-rule rejection for v0.1
+- invalid-regex handling
+- literal, regex, terms, and substitution rule evaluation
+- severity override resolution
+- duplicate-diagnostic prevention
 - empty-file segmentation behavior
 - file-line guard behavior
 

@@ -16,9 +16,9 @@ text without rewriting files.
 | 4. Input discovery | complete | Path, `changed`, `staged`, and stdin discovery plus source reading without rule coupling |
 | 5. Config loading and baseline init | complete | Repo-local config parsing plus baseline `voicelint init` file creation |
 | 6. Segmentation and source locations | complete | Markdown/plain-text segmentation with stable line and column mapping |
-| 7. Rule loading | pending | YAML rule loading into typed mechanical rule definitions |
-| 8. Rule evaluation and diagnostics | pending | Mechanical evaluation, source mapping, and blocking semantics |
-| 9. CLI formatting and ignores | pending | `pretty`, `json`, `agent`, default ignores, inline ignore directives |
+| 7. Rule loading | complete | YAML rule loading into typed mechanical rule definitions |
+| 8. Rule evaluation and diagnostics | complete | Mechanical evaluation, source mapping, and blocking semantics |
+| 9. CLI formatting and ignores | pending | Formatter polish plus inline ignore directives |
 | 10. Codex hook setup | pending | `.codex/hooks.json` merge path for `init --agent codex` |
 | 11. Release readiness | pending | CI checks, package verification, release checklist completion |
 
@@ -57,8 +57,8 @@ Phase 5 outputs now in repo:
   layer
 - baseline `voicelint init` creation for `voicelint.config.yml` and the
   baseline rule files, with idempotence and conflict reporting
-- tests for valid config parsing, invalid YAML, unknown severities, unknown rule
-  ids, missing config errors, and init creation/idempotence/conflicts
+- tests for valid config parsing, invalid YAML, unknown severities, missing
+  config errors, and init creation/idempotence/conflicts
 
 Phase 6 outputs now in repo:
 
@@ -69,15 +69,29 @@ Phase 6 outputs now in repo:
 - tests for heading, paragraph, list-item, CRLF, fenced-code, inline-code,
   multibyte column, and empty-file behavior
 
+Phase 7 outputs now in repo:
+
+- YAML loading for repo-local rule files under `voicelint/rules/`
+- typed mechanical rule definitions for `match`, `terms`, and `substitution`
+- validation for invalid YAML, invalid rule schemas, semantic-rule rejection,
+  invalid regex patterns, duplicate rule ids, and unknown configured rule ids
+
+Phase 8 outputs now in repo:
+
+- mechanical rule evaluation for Markdown, MDX, and plain-text sources
+- deterministic diagnostics with exact source ranges and optional suggestions
+- config severity overrides applied over rule file severities
+- blocking exit-code behavior for `error` diagnostics with stable JSON output
+
 ## Current Milestone
 
-The next implementation milestone is phase 7: rule loading.
+The next implementation milestone is phase 9: formatter polish and inline
+ignore directives.
 
-Required outputs for phase 7:
+Required outputs for phase 9:
 
-- YAML rule loading
-- typed rule definitions that consume discovered text sources without owning
-  discovery
+- finalize `pretty`, `json`, and `agent` output details against the CLI docs
+- add inline ignore directive parsing and enforcement
 
 ## Work Breakdown
 

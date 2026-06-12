@@ -1,89 +1,166 @@
-import { extname } from "node:path";
-
 import type { ParsedLintCommand } from "../cli/args.js";
-import { exitCodes } from "../cli/exit-code.js";
+import type { AppError } from "../shared/errors.js";
 import {
   loadVoiceLintConfig,
   type LoadedVoiceLintConfig,
 } from "../config/load-config.js";
+import {
+  createDiagnosticSummary,
+  formatDiagnostics,
+  formatLintErrorAsJson,
+} from "../diagnostics/format-diagnostics.js";
 import { discoverInputSources, type DiscoveredInputSources } from "../input/input-mode.js";
-import type { TextSource } from "../input/read-source.js";
-import { createMarkdownSegments } from "../segments/markdown-segments.js";
-import { createPlainTextSegments } from "../segments/plain-text-segments.js";
-import { ok, type CommandResult } from "../shared/result.js";
+import { evaluateRules } from "../rules/evaluate-rules.js";
+import { loadRules } from "../rules/load-rules.js";
+import { createRuleIndex, resolveConfiguredRules } from "../rules/rule-index.js";
+import { err, ok, type CommandResult, type Result } from "../shared/result.js";
+
+export interface LintCommandOptions {
+  readonly cwd?: string;
+}
 
 export async function executeLintCommand(
   command: ParsedLintCommand,
   input: NodeJS.ReadableStream,
+  options: LintCommandOptions = {},
 ): Promise<CommandResult> {
-  const loadedConfigResult = await loadVoiceLintConfig(command.configPath);
-  if (!loadedConfigResult.ok) {
-    return loadedConfigResult;
-  }
+  const preparedLintResult = await prepareLintExecution(command, input, options.cwd);
+  return preparedLintResult.ok
+    ? ok(
+        createLintSuccessOutput(
+          command.format,
+          preparedLintResult.value.discoveredInputSources,
+          preparedLintResult.value.loadedConfig,
+          preparedLintResult.value.loadedRules,
+        ),
+      )
+    : createFailureResult(command.format, preparedLintResult.error);
+}
 
+interface PreparedLintExecution {
+  readonly discoveredInputSources: DiscoveredInputSources;
+  readonly loadedConfig: LoadedVoiceLintConfig;
+  readonly loadedRules: Parameters<typeof evaluateRules>[1];
+}
+
+async function prepareLintExecution(
+  command: ParsedLintCommand,
+  input: NodeJS.ReadableStream,
+  cwd: string | undefined,
+): Promise<Result<PreparedLintExecution, AppError>> {
+  const loadedConfigResult = await loadVoiceLintConfig(
+    command.configPath,
+    createLoadConfigOptions(cwd),
+  );
+  return loadedConfigResult.ok
+    ? prepareLintSources(command, input, cwd, loadedConfigResult.value)
+    : loadedConfigResult;
+}
+
+async function prepareLintSources(
+  command: ParsedLintCommand,
+  input: NodeJS.ReadableStream,
+  cwd: string | undefined,
+  loadedConfig: LoadedVoiceLintConfig,
+): Promise<Result<PreparedLintExecution, AppError>> {
   const discoveredSourcesResult = await discoverInputSources(
     command,
     input,
-    createDiscoveryOptions(loadedConfigResult.value),
+    createDiscoveryOptions(loadedConfig, cwd),
   );
   return discoveredSourcesResult.ok
-    ? ok({
-        exitCode: exitCodes.failure,
-        stderrText: createLintShellText(
-          command,
-          discoveredSourcesResult.value,
-          loadedConfigResult.value,
-        ),
-      })
+    ? prepareLintRules(discoveredSourcesResult.value, loadedConfig)
     : discoveredSourcesResult;
+}
+
+async function prepareLintRules(
+  discoveredInputSources: DiscoveredInputSources,
+  loadedConfig: LoadedVoiceLintConfig,
+): Promise<Result<PreparedLintExecution, AppError>> {
+  const configuredRulesResult = await loadConfiguredRules(loadedConfig);
+  return configuredRulesResult.ok
+    ? ok({
+        discoveredInputSources,
+        loadedConfig,
+        loadedRules: configuredRulesResult.value,
+      })
+    : configuredRulesResult;
+}
+
+async function loadConfiguredRules(
+  loadedConfig: LoadedVoiceLintConfig,
+): Promise<Result<PreparedLintExecution["loadedRules"], AppError>> {
+  const loadedRulesResult = await loadRules(loadedConfig.configFilePath);
+  return loadedRulesResult.ok
+    ? resolveLoadedRules(loadedConfig, loadedRulesResult.value)
+    : loadedRulesResult;
+}
+
+function resolveLoadedRules(
+  loadedConfig: LoadedVoiceLintConfig,
+  loadedRules: readonly NonNullable<PreparedLintExecution["loadedRules"]>[number][],
+): Result<PreparedLintExecution["loadedRules"], AppError> {
+  const ruleIndexResult = createRuleIndex(loadedRules);
+  return ruleIndexResult.ok
+    ? resolveConfiguredRules(
+        ruleIndexResult.value,
+        loadedConfig.configFilePath,
+        loadedConfig.rules,
+      )
+    : ruleIndexResult;
+}
+
+function createLoadConfigOptions(cwd: string | undefined): Parameters<typeof loadVoiceLintConfig>[1] {
+  return createOptionalCwd(cwd);
 }
 
 function createDiscoveryOptions(
   loadedConfig: LoadedVoiceLintConfig,
+  cwd: string | undefined,
 ): Parameters<typeof discoverInputSources>[2] {
   return {
+    ...createOptionalCwd(cwd),
     includeGlobs: loadedConfig.include,
     excludeGlobs: loadedConfig.exclude,
   };
 }
 
-function createLintShellText(
-  command: ParsedLintCommand,
+function createLintSuccessOutput(
+  format: ParsedLintCommand["format"],
   discoveredInputSources: DiscoveredInputSources,
   loadedConfig: LoadedVoiceLintConfig,
-): string {
-  const segmentCount = countSegments(discoveredInputSources.sources);
-  return [
-    "VoiceLint input discovery completed.",
-    `Profile: ${loadedConfig.profile}`,
-    `Config path: ${loadedConfig.configFilePath}`,
-    `Input mode: ${discoveredInputSources.inputMode}`,
-    `Output format: ${command.format}`,
-    `Source count: ${discoveredInputSources.sources.length}`,
-    `Segment count: ${segmentCount}`,
-    ...createSourcePathLines(discoveredInputSources),
-    "Implementation pending.",
-    "",
-  ].join("\n");
+  loadedRules: Parameters<typeof evaluateRules>[1],
+) {
+  const diagnostics = evaluateRules(
+    discoveredInputSources.sources,
+    loadedRules,
+    loadedConfig.profile,
+  );
+  const summary = createDiagnosticSummary(
+    discoveredInputSources.sources.length,
+    diagnostics,
+  );
+
+  return {
+    exitCode: summary.exitCode,
+    stdoutText: formatDiagnostics(format, summary, diagnostics),
+  };
 }
 
-function createSourcePathLines(
-  discoveredInputSources: DiscoveredInputSources,
-): readonly string[] {
-  return discoveredInputSources.sources.map((source) => `- ${source.path}`);
+function createFailureResult(
+  format: ParsedLintCommand["format"],
+  error: AppError,
+): CommandResult {
+  return format === "json"
+    ? ok({
+        exitCode: error.exitCode,
+        stdoutText: formatLintErrorAsJson(error.message),
+      })
+    : err(error);
 }
 
-function countSegments(sources: readonly TextSource[]): number {
-  return sources.reduce((segmentCount, source) => segmentCount + readSegments(source).length, 0);
-}
-
-function readSegments(source: TextSource) {
-  return isMarkdownSource(source.path)
-    ? createMarkdownSegments(source.content)
-    : createPlainTextSegments(source.content);
-}
-
-function isMarkdownSource(sourcePath: string): boolean {
-  const fileExtension = extname(sourcePath).toLowerCase();
-  return fileExtension === ".md" || fileExtension === ".mdx";
+function createOptionalCwd(
+  cwd: string | undefined,
+): { readonly cwd?: string } {
+  return typeof cwd === "string" ? { cwd } : {};
 }

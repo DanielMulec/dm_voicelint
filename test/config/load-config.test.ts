@@ -78,7 +78,7 @@ describe("loadVoiceLintConfig", () => {
     );
   });
 
-  it("rejects unknown rule ids", async () => {
+  it("accepts configured rule ids for later rule resolution", async () => {
     const workspacePath = await createWorkspace();
     await writeConfigFile(
       workspacePath,
@@ -93,8 +93,14 @@ describe("loadVoiceLintConfig", () => {
 
     const configResult = await loadVoiceLintConfig(undefined, { cwd: workspacePath });
 
-    expect(configResult.ok).toBe(false);
-    expect(configResult.ok ? "" : configResult.error.message).toContain("product.unknown-rule");
+    expect(configResult).toMatchObject({
+      ok: true,
+      value: {
+        rules: {
+          "product.unknown-rule": "error",
+        },
+      },
+    });
   });
 });
 

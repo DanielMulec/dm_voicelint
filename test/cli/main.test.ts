@@ -39,15 +39,15 @@ describe("runCli", () => {
 
     expect(exitCode).toBe(0);
     expect(outputText).toContain("VoiceLint");
-    expect(outputText).toContain("v0.0.5 provides the TypeScript CLI shell, repo-local config loading");
-    expect(outputText).toContain("text segmentation for");
+    expect(outputText).toContain("v0.0.5 provides the TypeScript CLI, repo-local config loading");
+    expect(outputText).toContain("YAML mechanical rule loading");
     expect(outputText).toContain(
       "voicelint --stdin [--stdin-file-path PATH] [--config PATH] [--format pretty|json|agent]",
     );
     expect(outputText).toContain("voicelint init [--agent codex]");
     expect(outputText).toContain("Supported input file types: .md, .mdx, .txt");
     expect(outputText).toContain("voicelint init");
-    expect(outputText).not.toContain("parses the v0.1 command shell");
+    expect(outputText).toContain("deterministic pretty, json, and agent diagnostics");
     expect(errorText).toBe("");
   });
 
@@ -95,19 +95,16 @@ describe("runCli", () => {
   it("defines the default stdin content path for stdin mode", async () => {
     const workspacePath = await createWorkspace();
     const configPath = await writeBaselineConfig(workspacePath);
+    await writeBaselineRules(workspacePath);
     const { exitCode, outputText, errorText } = await runCliWithStreams(
       ["--stdin", "--config", configPath],
-      "stdin body\n",
+      "stdin — body\n",
     );
 
-    expect(exitCode).toBe(2);
-    expect(outputText).toBe("");
-    expect(errorText).toContain("Profile: product");
-    expect(errorText).toContain(`Config path: ${configPath}`);
-    expect(errorText).toContain("Input mode: stdin");
-    expect(errorText).toContain("Source count: 1");
-    expect(errorText).toContain("Segment count: 2");
-    expect(errorText).toContain("- <stdin>");
+    expect(exitCode).toBe(1);
+    expect(errorText).toBe("");
+    expect(outputText).toContain("<stdin>");
+    expect(outputText).toContain("style.no-em-dash");
   });
 
   it("returns a clear error when a lint command is missing config", async () => {
@@ -179,4 +176,73 @@ async function writeBaselineConfig(workspacePath: string): Promise<string> {
     ].join("\n"),
   );
   return configPath;
+}
+
+async function writeBaselineRules(workspacePath: string): Promise<void> {
+  await Promise.all([
+    writeWorkspaceFile(
+      workspacePath,
+      "voicelint/rules/style.no-em-dash.yml",
+      [
+        "id: style.no-em-dash",
+        "type: mechanical",
+        "severity: error",
+        "description: Do not use em dashes.",
+        "",
+        "match:",
+        '  pattern: "—"',
+        "",
+        'message: "Use a comma, colon, parentheses, or a sentence break instead of an em dash."',
+        "",
+      ].join("\n"),
+    ),
+    writeWorkspaceFile(
+      workspacePath,
+      "voicelint/rules/style.no-en-dash.yml",
+      [
+        "id: style.no-en-dash",
+        "type: mechanical",
+        "severity: error",
+        "description: Do not use en dashes.",
+        "",
+        "match:",
+        '  pattern: "–"',
+        "",
+        'message: "Use to, through, a hyphen, or explicit punctuation instead of an en dash."',
+        "",
+      ].join("\n"),
+    ),
+    writeWorkspaceFile(
+      workspacePath,
+      "voicelint/rules/copy.avoid-generic-product-words.yml",
+      [
+        "id: copy.avoid-generic-product-words",
+        "type: mechanical",
+        "severity: warning",
+        "description: Avoid generic product-copy words that do not name a concrete workflow.",
+        "",
+        "substitution:",
+        '  "seamless": "specific workflow description"',
+        "",
+        'message: "Replace generic product-copy language with a concrete claim."',
+        "",
+      ].join("\n"),
+    ),
+    writeWorkspaceFile(
+      workspacePath,
+      "voicelint/rules/product.preferred-terms.yml",
+      [
+        "id: product.preferred-terms",
+        "type: mechanical",
+        "severity: warning",
+        "description: Use approved VoiceLint terminology.",
+        "",
+        "terms:",
+        '  "AI assistant": "agent"',
+        "",
+        'message: "Use approved VoiceLint terminology."',
+        "",
+      ].join("\n"),
+    ),
+  ]);
 }
