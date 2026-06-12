@@ -20,7 +20,7 @@ Fallback package names:
 - `@danielmulec/voicelint`
 - `@voicelint/cli`
 
-The current package version is `0.1.0`.
+The current package version is `0.1.1`.
 
 ## License
 

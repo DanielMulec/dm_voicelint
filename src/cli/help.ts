@@ -4,7 +4,7 @@ const helpLines = [
   "VoiceLint is a CLI linting system for natural-language text in software projects.",
   "",
   "Status:",
-  "  v0.1.0 provides the TypeScript CLI, repo-local config loading,",
+  "  v0.1.1 provides the TypeScript CLI, repo-local config loading,",
   "  baseline init scaffolding, project-local Codex hook setup, input discovery, text segmentation,",
   "  YAML mechanical rule loading, and deterministic diagnostics for",
   "  path, changed, staged, and stdin modes.",
