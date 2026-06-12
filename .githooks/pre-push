@@ -6,27 +6,27 @@ remote_name="$1"
 remote_url="$2"
 expected_remote="git@github.com:DanielMulec/dm_voicelint.git"
 expected_ref="refs/heads/main"
+tag_prefix="refs/tags/v"
 validator="$repo_root/.githooks/validate-commit-message"
 
-if [ "$remote_name" != "origin" ]; then
-  echo "dm_voicelint policy: pushes are only allowed to origin" >&2
-  exit 1
-fi
+is_main_push() {
+  [ "$1" = "$expected_ref" ] && [ "$2" = "$expected_ref" ]
+}
 
-if [ "$remote_url" != "$expected_remote" ]; then
-  echo "dm_voicelint policy: unexpected push remote $remote_url" >&2
-  exit 1
-fi
+is_version_tag_push() {
+  case "$1" in
+    "$3"*)
+      [ "$1" = "$2" ]
+      return
+      ;;
+  esac
 
-while read -r local_ref local_sha remote_ref remote_sha
-do
-  [ -z "${local_ref:-}" ] && continue
-  if [ "$local_ref" != "$expected_ref" ] || [ "$remote_ref" != "$expected_ref" ]; then
-    echo "dm_voicelint policy: only main -> main pushes are allowed" >&2
-    echo "blocked: $local_ref -> $remote_ref" >&2
-    exit 1
-  fi
+  return 1
+}
 
+validate_main_push() {
+  local_sha="$1"
+  remote_sha="$2"
   commit_range="$remote_sha..$local_sha"
   if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
     commit_range="$local_sha"
@@ -54,4 +54,34 @@ do
     rm -f "$message_file" "$files_file"
     trap - EXIT INT TERM HUP
   done
+}
+
+if [ "$remote_name" != "origin" ]; then
+  echo "dm_voicelint policy: pushes are only allowed to origin" >&2
+  exit 1
+fi
+
+if [ "$remote_url" != "$expected_remote" ]; then
+  echo "dm_voicelint policy: unexpected push remote $remote_url" >&2
+  exit 1
+fi
+
+while read -r local_ref local_sha remote_ref remote_sha
+do
+  [ -z "${local_ref:-}" ] && continue
+  if is_main_push "$local_ref" "$remote_ref"; then
+    validate_main_push "$local_sha" "$remote_sha"
+    continue
+  fi
+
+  if is_version_tag_push "$local_ref" "$remote_ref" "$tag_prefix"; then
+    continue
+  fi
+
+  if [ "$local_ref" != "$expected_ref" ] || [ "$remote_ref" != "$expected_ref" ]; then
+    echo "dm_voicelint policy: only main -> main pushes are allowed" >&2
+    echo "dm_voicelint policy: version tags matching refs/tags/v* are also allowed" >&2
+    echo "blocked: $local_ref -> $remote_ref" >&2
+    exit 1
+  fi
 done
