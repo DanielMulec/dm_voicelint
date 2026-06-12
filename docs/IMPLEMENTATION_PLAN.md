@@ -20,7 +20,7 @@ text without rewriting files.
 | 8. Rule evaluation and diagnostics | complete | Mechanical evaluation, source mapping, and blocking semantics |
 | 9. CLI formatting and ignores | complete | Formatter polish plus inline ignore directives |
 | 10. End-to-end fixtures and dogfooding | complete | Built-package CLI tests plus fixture-based dogfooding |
-| 11. Codex hook setup | pending | `.codex/hooks.json` merge path for `init --agent codex` |
+| 11. Codex hook setup | complete | `.codex/hooks.json` merge path for `init --agent codex` |
 | 12. Release readiness | pending | Package verification, release checklist completion, initial publish readiness |
 
 ## Completed So Far
@@ -103,16 +103,22 @@ Phase 10 outputs now in repo:
 - fixture projects for init, lint, ignores, `changed`, `staged`, and stdin
 - JSON and agent output assertions through the packaged CLI path
 
+Phase 11 outputs now in repo:
+
+- `voicelint init --agent codex` creates or verifies the baseline files before
+  installing project-local Codex hook files
+- `.codex/hooks.json` is created or safely merged while preserving unrelated
+  events, matcher groups, and command handlers
+- changed existing hook config is backed up before writing
+- malformed existing hook config exits `2` with manual resolution instructions
+  and does not write hook scripts
+- generated PostToolUse and Stop wrappers call
+  `npx voicelint changed --format agent`
+- tests cover merge, install, backup, wrapper output, and CLI init behavior
+
 ## Current Milestone
 
-The next implementation milestone is phase 11: project-local Codex hook setup.
-
-Required outputs for phase 11:
-
-- merge VoiceLint into `.codex/hooks.json` without overwriting unrelated hooks
-- back up existing hook files before editing them
-- add focused tests for create, merge, backup, idempotence, and invalid existing
-  hook files
+The next implementation milestone is phase 12: release readiness.
 
 ## Work Breakdown
 
@@ -143,8 +149,6 @@ Required outputs for phase 11:
 - never rewrite user text
 - keep `init --agent codex` project-local
 - back up edited hook files before writing them
-- current `init --agent codex` behavior is intentionally manual until the hook
-  merge path is implemented
 
 ## Definition Of Done For v0.1
 

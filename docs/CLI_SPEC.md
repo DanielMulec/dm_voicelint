@@ -129,6 +129,8 @@ voicelint/rules/product.preferred-terms.yml
 
 ```text
 .codex/hooks.json
+.codex/voicelint-post-tool-use-hook.mjs
+.codex/voicelint-stop-hook.mjs
 ```
 
 Safety rules:
@@ -138,17 +140,22 @@ Safety rules:
 - existing config or rule files with conflicting content cause exit code `2`
 - baseline file conflicts print manual resolution instructions and are never
   overwritten
-- current implementation creates or verifies the baseline files first; Codex
-  hook setup still returns a manual follow-up instruction until hook support
-  lands
 - no global user configuration is edited
+- baseline files are created or verified before any `.codex` files are written
+- existing `.codex/hooks.json` is parsed and merged, never overwritten wholesale
+- unrelated hook events, matcher groups, and command handlers are preserved
+- a modified existing hook file is backed up as
+  `.codex/hooks.json.bak.<YYYYMMDDHHMMSS>`
+- malformed existing hook config exits `2` with manual resolution instructions
+  and does not write hook scripts
+- generated Codex wrappers call `npx voicelint changed --format agent`
 
-Planned Codex hook setup rules:
+Generated hook behavior:
 
-- existing `.codex/hooks.json` will be parsed and merged, never overwritten
-- a modified hook file will be backed up as `<filename>.bak.<YYYYMMDDHHMMSS>`
-- if an existing hook file cannot be parsed safely, VoiceLint will exit `2`
-  with a manual follow-up instruction
+- `PostToolUse` matches `apply_patch|Edit|Write` and gives quick changed-file
+  lint feedback after file-editing tools
+- `Stop` runs before Codex stops and blocks stopping when VoiceLint reports
+  blocking diagnostics or setup/config failures
 
 ## Exit Codes
 

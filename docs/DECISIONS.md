@@ -237,10 +237,10 @@ parsed safely.
 
 Global user configuration must never be edited.
 
-Current implementation status: base `voicelint init` creates or verifies the
-repo-local config and baseline rule files. `init --agent codex` is parsed, but
-the Codex hook merge path is pending and currently returns a manual follow-up
-instruction after the baseline files are handled.
+Current implementation status: `voicelint init --agent codex` creates or
+verifies the repo-local config and baseline rule files, then installs
+project-local Codex hook config and wrapper scripts. The wrappers call
+`npx voicelint changed --format agent` and never rewrite user text.
 
 ## Future Semantic Direction
 

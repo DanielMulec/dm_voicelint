@@ -15,15 +15,14 @@ Completed phases:
 - phase 8: rule evaluation and diagnostics
 - phase 9: CLI formatting and inline ignores
 - phase 10: built-package end-to-end fixtures and dogfooding
+- phase 11: project-local Codex hook setup
 
 The repository now has a compiled TypeScript CLI, CI, tests, repo-local config
 loading, source discovery, Markdown/plain-text segmentation, mechanical rule
-loading, deterministic diagnostics, pretty/JSON/agent output, and Markdown/MDX
-inline ignore handling.
+loading, deterministic diagnostics, pretty/JSON/agent output, Markdown/MDX
+inline ignore handling, and optional project-local Codex hook setup.
 
-Codex hook setup through `init --agent codex` remains the next implementation
-milestone. The current command creates or verifies the baseline config and rule
-files, then returns a manual hook-setup follow-up until hook merging lands.
+Release readiness remains the next implementation milestone.
 
 ## v0.1 Delivery Order
 
@@ -40,8 +39,8 @@ files, then returns a manual hook-setup follow-up until hook merging lands.
 7. Completed: rule evaluation and diagnostic assembly.
 8. Completed: `pretty` / `json` / `agent` formatting plus default ignores and
    Markdown/MDX inline ignore directives.
-9. Next: optional Codex hook setup through `.codex/hooks.json`.
-10. Last: release verification, packaging, and initial npm publish.
+9. Completed: optional Codex hook setup through `.codex/hooks.json`.
+10. Next: release verification, packaging, and initial npm publish.
 
 The detailed tracker lives in [Implementation plan](IMPLEMENTATION_PLAN.md).
 

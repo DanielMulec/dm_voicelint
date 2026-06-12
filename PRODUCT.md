@@ -49,9 +49,8 @@ npx voicelint --stdin
 Agent integrations, Git hooks, editor integrations, and future dashboards should all call the same CLI.
 
 The current implementation proves the deterministic CLI path. Remaining v0.1
-work should finish project-local Codex hook setup and release verification
-before adding semantic linting, provider-backed judging, or semantic rule test
-commands.
+work should finish release verification before adding semantic linting,
+provider-backed judging, or semantic rule test commands.
 
 ## Documentation Map
 

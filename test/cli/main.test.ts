@@ -48,6 +48,7 @@ describe("runCli", () => {
     expect(outputText).toContain("Supported input file types: .md, .mdx, .txt");
     expect(outputText).toContain("voicelint init");
     expect(outputText).toContain("deterministic pretty, json, and agent diagnostics");
+    expect(outputText).toContain("installs project-local Codex hooks");
     expect(errorText).toBe("");
   });
 

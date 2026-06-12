@@ -23,14 +23,13 @@ npx voicelint init
 npx voicelint init --agent codex
 ```
 
-`init --agent codex` may create project-local hook files after the hook merge
-path is implemented, but it must not silently edit global user configuration.
-Claude setup is deferred until after v0.1.
+`init --agent codex` creates or verifies the normal VoiceLint baseline first,
+then installs project-local Codex hook files. It must not silently edit global
+user configuration. Claude setup is deferred until after v0.1.
 
 Hook setup is intentionally after the base CLI path. Config loading, input
-discovery, segmentation, mechanical diagnostics, ignore handling, and output
-formatting now work; the remaining implementation work is the safe project-local
-hook merge.
+discovery, segmentation, mechanical diagnostics, ignore handling, output
+formatting, and the safe project-local Codex hook merge now work.
 
 The init output should remind the user that agent projects may need to be trusted before project-local hooks run.
 
@@ -59,14 +58,54 @@ Required behavior:
 
 Codex supports project-local configuration and hooks, but project-local config is only loaded when the project is trusted.
 
-VoiceLint should prefer project-local files such as:
+VoiceLint installs these project-local files:
 
 ```text
 .codex/hooks.json
+.codex/voicelint-post-tool-use-hook.mjs
+.codex/voicelint-stop-hook.mjs
 ```
 
-The selected v0.1 hook target is `.codex/hooks.json`. The merge behavior still
-needs to be implemented and verified against the current Codex hook schema.
+The selected v0.1 hook target is `.codex/hooks.json`. VoiceLint merges its hook
+entries into existing project-local hook config, preserves unrelated events and
+handlers, and backs up changed existing hook config before writing.
+
+### PostToolUse
+
+Purpose: give Codex quick feedback after file-editing tools.
+
+Matcher:
+
+```text
+apply_patch|Edit|Write
+```
+
+The generated wrapper reads Codex hook input from stdin, then runs:
+
+```bash
+npx voicelint changed --format agent
+```
+
+If VoiceLint exits `0`, the wrapper writes `{}`. If VoiceLint exits `1` or `2`,
+the wrapper writes JSON with `decision: "block"` and a reason containing the
+diagnostics or setup/config failure. The wrapper does not modify files.
+
+### Stop
+
+Purpose: provide a final safety net before Codex stops.
+
+The generated wrapper reads Codex hook input from stdin. If
+`stop_hook_active === true`, it writes `{ "continue": true }` to avoid recursive
+blocking. Otherwise it runs:
+
+```bash
+npx voicelint changed --format agent
+```
+
+If VoiceLint exits `0`, the wrapper writes `{ "continue": true }`. If VoiceLint
+exits `1` or `2`, it writes JSON with `decision: "block"` and asks Codex to make
+one more pass or resolve setup/config failures before stopping. The wrapper does
+not emit plain text stdout and does not modify files.
 
 ## Claude Code
 

@@ -9,9 +9,9 @@ behavior, and no silent rewriting.
 ## Status
 
 The deterministic v0.1 CLI path is implemented through built-package
-end-to-end coverage. The remaining planned v0.1 work is project-local Codex
-hook setup through `init --agent codex`, followed by release verification and
-publishing.
+end-to-end coverage, including project-local Codex hook setup through
+`init --agent codex`. The remaining planned v0.1 work is release verification
+and publishing.
 
 Implemented so far:
 
@@ -27,16 +27,13 @@ Implemented so far:
 - pretty, JSON, and agent diagnostic output
 - Markdown and MDX ignore comment handling
 - end-to-end built-package CLI coverage for init, lint, stdin, changed, and staged
+- optional project-local Codex hooks for changed-file lint feedback
 - engineering boundary refactors for config validation, source segmentation,
   diagnostic orchestration, mechanical evaluation, and output formatting
 
 VoiceLint v0.1 is deterministic mechanical linting only. It does not do
 semantic judging, provider calls, or file rewriting. Diagnostics may include
 suggestions, but linting never edits user text.
-
-Not implemented yet:
-
-- Codex hook setup through `init --agent codex`
 
 ## CLI Examples
 
@@ -46,6 +43,7 @@ npx voicelint .
 npx voicelint changed
 npx voicelint staged
 npx voicelint --stdin
+npx voicelint init --agent codex
 ```
 
 ## v0.1 Scope

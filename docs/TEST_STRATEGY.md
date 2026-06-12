@@ -56,6 +56,13 @@ Current implemented tests:
 - file-line guard behavior
 - built-package CLI execution for help, init, lint, stdin, `changed`, and
   `staged`
+- `init --agent codex` CLI behavior for hook creation, repeated skips,
+  unsupported agents, baseline conflicts, and malformed existing hook config
+- pure Codex hook merge behavior for preservation, additions, idempotence, and
+  unsafe existing shapes
+- Codex hook installer behavior for creation, deterministic backups,
+  idempotence, malformed hook config, and generated scripts
+- generated Codex wrapper behavior for VoiceLint exit codes `0`, `1`, and `2`
 
 ## v0.1 Test Layers
 
@@ -110,7 +117,7 @@ Required CLI integration coverage:
 - exit codes `0`, `1`, and `2`
 - `pretty`, `json`, and `agent` output modes
 - `init`
-- `init --agent codex` once hook merging is implemented
+- `init --agent codex`
 
 ### 5. Governance Checks
 
